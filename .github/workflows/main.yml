@@ -1,13 +1,13 @@
-name: Deploys Lilaobot GCP infrastructure
+name: Lilaobot main workflow
 
 on:
   push:
     branches: [ master ]
 
 jobs:
-  plan:
+  deploy:
     runs-on: ubuntu-latest
-    name: Create a plan for an example terraform configuration
+    name: Deploys Lilaobot GCP infrastructure with Terraform
     env:
       TF_VAR_gcp_credentials: ${{ secrets.GCP_SA_KEY }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT }}
