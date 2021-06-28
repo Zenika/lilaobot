@@ -1,8 +1,9 @@
 import base64
 import os
 from google.cloud import secretmanager
-from slack import WebClient
-from slack.errors import SlackApiError
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
 
 def publishToSlack(event, context):
     """Triggered from a message on a Cloud Pub/Sub topic.
@@ -22,13 +23,12 @@ def publishToSlack(event, context):
     client = WebClient(token=slack_token)
 
     pubsub_message = base64.b64decode(event['data']).decode('utf-8')
-    print(pubsub_message)
 
     try:
       response = client.chat_postMessage(
-        channel="C021BGBSMFY",
-        text="Hello from your app! :tada:"
+          channel="C021BGBSMFY",
+          text="Message received from Pub/sub: " + str(pubsub_message)
       )
     except SlackApiError as e:
-      # You will get a SlackApiError if "ok" is False
-      assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
+        # You will get a SlackApiError if "ok" is False
+        assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
