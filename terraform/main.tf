@@ -19,7 +19,7 @@ resource "google_storage_bucket_object" "archive" {
 resource "google_cloudfunctions_function" "function" {
   name        = "slack-publisher"
   description = "Receives messages from Pub/sub and send them to Slack"
-  runtime     = "nodejs14"
+  runtime     = "python39"
 
   available_memory_mb   = 128
   source_archive_bucket = google_storage_bucket.functions_bucket.name
