@@ -10,6 +10,21 @@
 
 > lilaobot allows call for offers from various sources (currently OBMS and Little Big Connection are envisionned) to be gathered from sources and to be published into Slack channel
 
+## Setup
+### How
+On each commit, Github Actions applies Terraform conf (located at `./terraform`),
+to deploy the GCP Function (located at `./src`)
+
+Terraform state is saved in a Google Cloud Storage named `lilaobot-terraform-state`
+
+### Requirements
+- a GCS bucket to store Terraform's state
+- a GCP Service Account, with `Cloud Function Developer`, `Service Account User`, `Storage Object Admin` and `Storage Admin` roles
+- Secrets on Github repository:
+    - GCP_SA_KEY (service account credentials, a JSON file)
+    - GCP_PROJECT (project id)
+
+
 ## Author
 
 👤 **Logan Hauspie**

@@ -1,0 +1,31 @@
+name: Deploys Lilaobot GCP infrastructure
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    name: Create a plan for an example terraform configuration
+    env:
+      TF_VAR_gcp_credentials: ${{ secrets.GCP_SA_KEY }}
+      TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+
+      # Setup gcloud CLI
+      - uses: google-github-actions/setup-gcloud@master
+        with:
+          version: '290.0.1'
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT }}
+          export_default_credentials: true
+
+      - name: terraform apply
+        uses: dflook/terraform-apply@v1
+        with:
+          path: terraform
+          auto_approve: true
