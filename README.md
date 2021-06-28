@@ -10,6 +10,8 @@
 
 > lilaobot allows call for offers from various sources (currently OBMS and Little Big Connection are envisionned) to be gathered from sources and to be published into Slack channel
 
+Work in progress :construction:
+
 ## Setup
 ### How
 On each commit, Github Actions applies Terraform conf (located at `./terraform`),
