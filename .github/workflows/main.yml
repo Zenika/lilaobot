@@ -2,7 +2,8 @@ name: Lilaobot main workflow
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   deploy:
