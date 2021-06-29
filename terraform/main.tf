@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "functions_bucket" {
-  name = "lilaobot-functions-storage"
+  name          = "lilaobot-functions-storage"
   force_destroy = true
 }
 
@@ -11,7 +11,7 @@ data "archive_file" "function_archive" {
 
 # https://github.com/hashicorp/terraform-provider-google/issues/1938 dynamic name, otherwise the Function cannot be updated
 resource "google_storage_bucket_object" "archive" {
-  name = format("%s#%s", var.bucket_archive_filepath, data.archive_file.function_archive.output_md5)
+  name   = format("%s#%s", var.bucket_archive_filepath, data.archive_file.function_archive.output_md5)
   bucket = google_storage_bucket.functions_bucket.name
   source = data.archive_file.function_archive.output_path
 }
@@ -28,7 +28,7 @@ resource "google_cloudfunctions_function" "function" {
   entry_point           = var.function_entrypoint
   event_trigger {
     event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
-    resource = "projects/${var.gcp_project}/topics/${var.function_topic}"
+    resource   = "projects/${var.gcp_project}/topics/${var.function_topic}"
   }
 }
 
@@ -38,8 +38,8 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
   region         = google_cloudfunctions_function.function.region
   cloud_function = google_cloudfunctions_function.function.name
 
-  role   = "roles/cloudfunctions.invoker"
-#  member = "user:myFunctionInvoker@example.com" TODO maybe be more precise ?
+  role = "roles/cloudfunctions.invoker"
+  #  member = "user:myFunctionInvoker@example.com" TODO maybe be more precise ?
   member = "allUsers"
 }
 
