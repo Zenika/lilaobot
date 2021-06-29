@@ -1,3 +1,7 @@
+resource "google_pubsub_topic" "default" {
+  name = var.function_topic
+}
+
 resource "google_storage_bucket" "functions_bucket" {
   name          = "lilaobot-functions-storage"
   force_destroy = true
