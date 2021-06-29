@@ -5,6 +5,10 @@ on:
     branches:
       - '!master'
 
+env:
+  TF_VAR_gcp_credentials: ${{ secrets.GCP_SA_KEY }}
+  TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT }}
+
 jobs:
   validate:
     runs-on: ubuntu-latest
