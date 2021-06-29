@@ -1,3 +1,4 @@
+
 resource "google_storage_bucket" "functions_bucket" {
   name          = "lilaobot-functions-storage"
   force_destroy = true
