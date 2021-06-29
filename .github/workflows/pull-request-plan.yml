@@ -9,6 +9,7 @@ jobs:
     env:
       TF_VAR_gcp_credentials: ${{ secrets.GCP_SA_KEY }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
