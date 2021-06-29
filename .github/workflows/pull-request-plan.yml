@@ -1,0 +1,20 @@
+name: Create terraform plan
+
+on: [pull_request]
+
+env:
+  TF_VAR_gcp_credentials: ${{ secrets.GCP_SA_KEY }}
+  TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    name: Create a terraform plan configuration
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: terraform plan
+        uses: dflook/terraform-plan@v1
+        with:
+          path: my-terraform-config
