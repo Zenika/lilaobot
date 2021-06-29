@@ -2,8 +2,8 @@ name: Validate Terraform syntax
 
 on:
   push:
-    branches:
-      - '!master'
+    branches-ignore:
+      - master
 
 env:
   TF_VAR_gcp_credentials: ${{ secrets.GCP_SA_KEY }}
