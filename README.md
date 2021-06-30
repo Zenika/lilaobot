@@ -15,7 +15,7 @@ Work in progress :construction:
 ## Setup
 ### How
 On each commit, Github Actions applies Terraform conf (located at `./terraform`),
-to deploy the GCP Function (located at `./src`)
+to deploy the GCP Function (located at `./functions`)
 
 Terraform state is saved in a Google Cloud Storage named `lilaobot-terraform-state`
 
