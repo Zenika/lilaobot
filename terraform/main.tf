@@ -33,7 +33,7 @@ resource "google_storage_bucket_object" "slack_publisher_archive" {
 resource "google_storage_bucket_object" "gmail_notifier_archive" {
   name   = format("%s#%s", var.gmail_notifier_bucket_archive_filepath, data.archive_file.gmail_notifier_archive.output_md5)
   bucket = google_storage_bucket.functions_bucket.name
-  source = data.archive_file.slack_publisher_archive.output_path
+  source = data.archive_file.gmail_notifier_archive.output_path
 }
 
 resource "google_cloudfunctions_function" "slack_publisher_function" {
