@@ -147,15 +147,9 @@ exports.onNewMessage = (message, context) => {
       const messageBuffer = Buffer.from(JSON.stringify(messageObject), 'utf8');
 
       // Publishes a message
-      try {
-        await topic.publish(messageBuffer);
-        res.status(200).send('Message published.');
-      } catch (err) {
-        console.error(err);
-        res.status(500).send(err);
-        return Promise.reject(err);
-      }
+      return topic.publish(messageBuffer);
     })
+    .then(() => console.info('Message published.'))
     .catch((err) => {
       // Handle unexpected errors
       if (!err.message || err.message !== config.NO_LABEL_MATCH) {
