@@ -15,16 +15,16 @@
 
 'use strict';
 
-var { google } = require('googleapis');
-const gmail = google.gmail('v1');
+//var { google } = require('googleapis');
+//const gmail = google.gmail('v1');
 const querystring = require('querystring');
-const config = require('./config');
+//const config = require('./config');
 const oauth = require('./lib/oauth');
-const helpers = require('./lib/helpers');
-const { PubSub } = require('@google-cloud/pubsub');
+//const helpers = require('./lib/helpers');
+//const { PubSub } = require('@google-cloud/pubsub');
 
 // Instantiates a client
-const pubsub = new PubSub();
+//const pubsub = new PubSub();
 
 /**
  * Request an OAuth 2.0 authorization code
@@ -85,6 +85,7 @@ exports.oauth2callback = (req, res) => {
 /**
  * Initialize a watch on the user's inbox
  */
+/*
 exports.initWatch = (req, res) => {
   // Require a valid email address
   if (!req.query.emailAddress) {
@@ -123,10 +124,11 @@ exports.initWatch = (req, res) => {
       }
     });
 };
-
+*/
 /**
 * Process new messages as they are received
 */
+/*
 exports.onNewMessage = (message, context) => {
   // Parse the Pub/Sub message
   const dataStr = Buffer.from(message.data, 'base64').toString();
@@ -157,3 +159,4 @@ exports.onNewMessage = (message, context) => {
       }
     });
 };
+*/
