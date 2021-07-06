@@ -12,22 +12,22 @@ def publishToSlack(event, context):
          context (google.cloud.functions.Context): Metadata for the event.
     """
 
-    client = secretmanager.SecretManagerServiceClient()
+    client      = secretmanager.SecretManagerServiceClient()
     secret_name = "slack-bot-token"
-    project_id = "lilaobot"
-    request = {"name": f"projects/{project_id}/secrets/{secret_name}/versions/latest"}
-    response = client.access_secret_version(request)
-    secret_string = response.payload.data.decode("UTF-8")
+    project_id  = "lilaobot"
+    request     = {"name": f"projects/{project_id}/secrets/{secret_name}/versions/latest"}
+    response    = client.access_secret_version(request)
+    slack_token = response.payload.data.decode("UTF-8")
 
-    slack_token = secret_string
-    client = WebClient(token=slack_token)
+    client      = WebClient(token=slack_token)
 
     pubsub_message = base64.b64decode(event['data']).decode('utf-8')
+    email_message  = base64.b64decode(pubsub_message['data']['message']).decode('utf-8')
 
     try:
       response = client.chat_postMessage(
-          channel="C021BGBSMFY",
-          text="Message received from Pub/sub: " + str(pubsub_message)
+          channel = "C021BGBSMFY",
+          text    = "Message received from Pub/sub: " + str(email_message)
       )
     except SlackApiError as e:
         # You will get a SlackApiError if "ok" is False

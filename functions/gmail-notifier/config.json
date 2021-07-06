@@ -1,0 +1,6 @@
+{
+  "GCF_REGION": "europe-west1",
+  "GCLOUD_PROJECT": "lilaobot",
+  "TOPIC_GMAIL_NEW_MESSAGE_ID": "gmail_new_message",
+  "TOPIC_CALL_FOR_OFFER_ID": "calls_for_offer"
+}
