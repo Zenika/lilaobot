@@ -34,6 +34,17 @@ Terraform state is saved in a Google Cloud Storage named `lilaobot-terraform-sta
 * Twitter: [@lhauspie](https://twitter.com/lhauspie)
 * Github: [@lhauspie](https://github.com/lhauspie)
 
+## Contributors
+
+👤 **Roman Acevedo**
+
+* Github: [@AcevedoR](https://github.com/AcevedoR)
+
+👤 **Douglas Six**
+
+* Twitter: [@sixdouglas](https://twitter.com/sixdouglas)
+* Github: [@sixdouglas](https://github.com/sixdouglas)
+
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/Zenika/lilaobot/issues). 
