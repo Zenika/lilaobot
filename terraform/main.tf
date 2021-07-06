@@ -81,31 +81,31 @@ resource "google_cloudfunctions_function" "oauth2_init_function" {
   trigger_http          = true
 }
 
-resource "google_cloudfunctions_function" "oauth2_callback_function" {
-  name        = "oauth2-callback"
-  description = "Http Endpoint needed to save oauth2 token"
-  runtime     = "nodejs14"
+#resource "google_cloudfunctions_function" "oauth2_callback_function" {
+#  name        = "oauth2-callback"
+#  description = "Http Endpoint needed to save oauth2 token"
+#  runtime     = "nodejs14"
+#
+#  available_memory_mb   = 128
+#  source_archive_bucket = google_storage_bucket.functions_bucket.name
+#  source_archive_object = google_storage_bucket_object.gmail_notifier_archive.name
+#  timeout               = 60
+#  entry_point           = var.oauth2_callback_function_entrypoint
+#  trigger_http          = true
+#}
 
-  available_memory_mb   = 128
-  source_archive_bucket = google_storage_bucket.functions_bucket.name
-  source_archive_object = google_storage_bucket_object.gmail_notifier_archive.name
-  timeout               = 60
-  entry_point           = var.oauth2_callback_function_entrypoint
-  trigger_http          = true
-}
-
-resource "google_cloudfunctions_function" "gmail_initWatch_function" {
-  name        = "gmail-initWatch"
-  description = "Http Endpoint needed to initiate GMail new e-mail watcher"
-  runtime     = "nodejs14"
-
-  available_memory_mb   = 128
-  source_archive_bucket = google_storage_bucket.functions_bucket.name
-  source_archive_object = google_storage_bucket_object.gmail_notifier_archive.name
-  timeout               = 60
-  entry_point           = var.gmail_initWatch_function_entrypoint
-  trigger_http          = true
-}
+#resource "google_cloudfunctions_function" "gmail_initWatch_function" {
+#  name        = "gmail-initWatch"
+#  description = "Http Endpoint needed to initiate GMail new e-mail watcher"
+#  runtime     = "nodejs14"
+#
+#  available_memory_mb   = 128
+#  source_archive_bucket = google_storage_bucket.functions_bucket.name
+#  source_archive_object = google_storage_bucket_object.gmail_notifier_archive.name
+#  timeout               = 60
+#  entry_point           = var.gmail_initWatch_function_entrypoint
+#  trigger_http          = true
+#}
 
 # IAM entry for all users to invoke the function
 resource "google_cloudfunctions_function_iam_member" "slack_publisher_invoker" {
@@ -141,25 +141,25 @@ resource "google_cloudfunctions_function_iam_member" "oauth2_init_invoker" {
 }
 
 # IAM entry for all users to invoke the function
-resource "google_cloudfunctions_function_iam_member" "oauth2_callback_invoker" {
-  project        = google_cloudfunctions_function.oauth2_callback_function.project
-  region         = google_cloudfunctions_function.oauth2_callback_function.region
-  cloud_function = google_cloudfunctions_function.oauth2_callback_function.name
-
-  role = "roles/cloudfunctions.invoker"
-  #  member = "user:myFunctionInvoker@example.com" TODO maybe be more precise ?
-  member = "allUsers"
-}
+#resource "google_cloudfunctions_function_iam_member" "oauth2_callback_invoker" {
+#  project        = google_cloudfunctions_function.oauth2_callback_function.project
+#  region         = google_cloudfunctions_function.oauth2_callback_function.region
+#  cloud_function = google_cloudfunctions_function.oauth2_callback_function.name
+#
+#  role = "roles/cloudfunctions.invoker"
+#  #  member = "user:myFunctionInvoker@example.com" TODO maybe be more precise ?
+#  member = "allUsers"
+#}
 
 # IAM entry for all users to invoke the function
-resource "google_cloudfunctions_function_iam_member" "gmail_initWatch_invoker" {
-  project        = google_cloudfunctions_function.gmail_initWatch_function.project
-  region         = google_cloudfunctions_function.gmail_initWatch_function.region
-  cloud_function = google_cloudfunctions_function.gmail_initWatch_function.name
-
-  role = "roles/cloudfunctions.invoker"
-  #  member = "user:myFunctionInvoker@example.com" TODO maybe be more precise ?
-  member = "allUsers"
-}
+#resource "google_cloudfunctions_function_iam_member" "gmail_initWatch_invoker" {
+#  project        = google_cloudfunctions_function.gmail_initWatch_function.project
+#  region         = google_cloudfunctions_function.gmail_initWatch_function.region
+#  cloud_function = google_cloudfunctions_function.gmail_initWatch_function.name
+#
+#  role = "roles/cloudfunctions.invoker"
+#  #  member = "user:myFunctionInvoker@example.com" TODO maybe be more precise ?
+#  member = "allUsers"
+#}
 
 
