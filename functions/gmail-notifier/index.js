@@ -29,8 +29,10 @@ exports.oauth2init = (req, res) => {
     'https://www.googleapis.com/auth/gmail.readonly'
   ];
 
+  const oAuth2Client = await oauth.getOAuth2Client();
+
   // Generate + redirect to OAuth2 consent form URL
-  const authUrl = oauth.client.generateAuthUrl({
+  const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
     prompt: 'consent' // Required in order to receive a refresh token every time
@@ -44,16 +46,18 @@ exports.oauth2init = (req, res) => {
 exports.oauth2callback = (req, res) => {
   // Get authorization code from request
   const code = req.query.code;
+  const oAuth2Client = await oauth.getOAuth2Client();
+
 
   // OAuth2: Exchange authorization code for access token
   return new Promise((resolve, reject) => {
-    oauth.client.getToken(code, (err, token) =>
+    oAuth2Client.getToken(code, (err, token) =>
       (err ? reject(err) : resolve(token))
     );
   })
     .then((token) => {
       // Get user email (to use as a Datastore key)
-      oauth.client.credentials = token;
+      oAuth2Client.credentials = token;
       return Promise.all([token, oauth.getEmailAddress()]);
     })
     .then(([token, emailAddress]) => {
