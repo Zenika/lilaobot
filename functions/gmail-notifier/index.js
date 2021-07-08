@@ -23,57 +23,46 @@ const oauth = require('./lib/oauth');
  * Only new users (or those who want to refresh
  * their auth data) need visit this page
  */
-exports.oauth2init = (req, res) => {
+exports.oauth2init = async (req, res) => {
   // Define OAuth2 scopes
   const scopes = [
     'https://www.googleapis.com/auth/gmail.readonly'
   ];
 
   const oAuth2Client = await oauth.getOAuth2Client();
-
-  // Generate + redirect to OAuth2 consent form URL
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
     prompt: 'consent' // Required in order to receive a refresh token every time
   });
-  return res.redirect(authUrl);
+  res.redirect(authUrl);
 };
 
 /**
  * Get an access token from the authorization code and store token in Datastore
  */
-exports.oauth2callback = (req, res) => {
+exports.oauth2callback = async (req, res) => {
   // Get authorization code from request
   const code = req.query.code;
-  const oAuth2Client = await oauth.getOAuth2Client();
-
+  
+  try {
+    const oAuth2Client = await oauth.getOAuth2Client();
+    const token_1 = await new Promise((resolve, reject) => {
+      oAuth2Client.getToken(code, (err, token) => (err ? reject(err) : resolve(token))
+      );
+    });
+    
+    // Get user email (to use as a Datastore key)
+    oAuth2Client.credentials = token_1;
+    const emailAddress = await oauth.getEmailAddress();
+    await oauth.saveToken(emailAddress);
+    // Respond to request
+    res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
+  } catch (err_1) {
+    // Handle error
+    console.error(err_1);
+    res.status(500).send('Something went wrong; check the logs.');
+  }
 
   // OAuth2: Exchange authorization code for access token
-  return new Promise((resolve, reject) => {
-    oAuth2Client.getToken(code, (err, token) =>
-      (err ? reject(err) : resolve(token))
-    );
-  })
-    .then((token) => {
-      // Get user email (to use as a Datastore key)
-      oAuth2Client.credentials = token;
-      return Promise.all([token, oauth.getEmailAddress()]);
-    })
-    .then(([token, emailAddress]) => {
-      // Store token in Datastore
-      return Promise.all([
-        emailAddress,
-        oauth.saveToken(emailAddress)
-      ]);
-    })
-    .then(([emailAddress]) => {
-      // Respond to request
-      res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
-    })
-    .catch((err) => {
-      // Handle error
-      console.error(err);
-      res.status(500).send('Something went wrong; check the logs.');
-    });
 };

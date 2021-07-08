@@ -39,9 +39,7 @@ async function accessSecretVersion(secretName) {
 
 // Retrieve OAuth2 config
 exports.getOAuth2Client = async () => {
-  const oauth2ClientId = accessSecretVersion("oauth2-client-id");
-  const oauth2ClientSecret = accessSecretVersion("oauth2-client-secret");
-
+  const [oauth2ClientId, oauth2ClientSecret] = await Promise.all(accessSecretVersion("oauth2-client-id"), accessSecretVersion("oauth2-client-secret"));
   return new google.auth.OAuth2(
     oauth2ClientId,
     oauth2ClientSecret,
@@ -53,6 +51,8 @@ exports.getOAuth2Client = async () => {
  * Helper function to get the current user's email address
  */
 exports.getEmailAddress = async (t) => {
+  const oauth2Client = await getOAuth2Client();
+
   return gmail.users.getProfile({
     auth: oauth2Client,
     userId: 'me'
@@ -64,44 +64,39 @@ exports.getEmailAddress = async (t) => {
  * Helper function to fetch a user's OAuth 2.0 access token
  * Can fetch current tokens from Datastore, or create new ones
  */
-exports.fetchToken = (emailAddress) => {
-  const oauth2Client = await getOAuth2Client();
+exports.fetchToken = async (emailAddress) => {
 
-  return datastore.get(datastore.key(['oauth2Token', emailAddress]))
-    .then((tokens) => {
-      const token = tokens[0];
-
-      // Check for new users
-      if (!token) {
-        throw new Error(config.UNKNOWN_USER_MESSAGE);
-      }
-
-      // Validate token
-      if (!token.expiry_date || token.expiry_date < Date.now() + 60000) {
-        oauth2Client.credentials.refresh_token =
-          oauth2Client.credentials.refresh_token || token.refresh_token;
-        return new Promise((resolve, reject) => { // Pify and oauth2client don't mix
-          oauth2Client.refreshAccessToken((err, response) => {
-            if (err) {
-              return reject(err);
-            }
-            return resolve();
-          });
-        })
-          .then(() => {
-            return exports.saveToken(emailAddress);
-          });
-      } else {
-        oauth2Client.credentials = token;
-        return Promise.resolve();
-      }
-    });
+  const [oauth2Client, tokens] = await Promise.all(getOAuth2Client(), datastore.get(datastore.key(['oauth2Token', emailAddress])));
+  const token = tokens[0];
+  // Check for new users
+  if (!token) {
+    throw new Error(config.UNKNOWN_USER_MESSAGE);
+  }
+  // Validate token
+  if (!token.expiry_date || token.expiry_date < Date.now() + 60000) {
+    oauth2Client.credentials.refresh_token =
+      oauth2Client.credentials.refresh_token || token.refresh_token;
+    return new Promise((resolve, reject) => {
+      oauth2Client.refreshAccessToken((err, response) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve();
+      });
+    })
+      .then(() => {
+        return exports.saveToken(emailAddress);
+      });
+  } else {
+    oauth2Client.credentials = token;
+    return Promise.resolve();
+  }
 };
 
 /**
  * Helper function to save an OAuth 2.0 access token to Datastore
  */
-exports.saveToken = (emailAddress) => {
+exports.saveToken = async (emailAddress) => {
   const oauth2Client = await getOAuth2Client();
 
   return datastore.save({
