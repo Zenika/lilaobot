@@ -1,5 +1,5 @@
 {
-  "name": "community-gcf-oauth",
+  "name": "gmail-notifier",
   "version": "0.0.1",
   "private": true,
   "license": "Apache-2.0",
@@ -9,7 +9,7 @@
     "url": "https://github.com/Zenika/lilaobot.git"
   },
   "engines": {
-    "node": ">=14.0"
+    "node": ">=12.0"
   },
   "scripts": {
     "fix": "semistandard --fix",
