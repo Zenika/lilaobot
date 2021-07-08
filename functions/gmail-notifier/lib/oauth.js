@@ -17,21 +17,37 @@
 
 const config = require('../config');
 const {Datastore} = require('@google-cloud/datastore');
+// Imports the Secret Manager library
+const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const datastore = new Datastore();
 const path = require('path');
 const fs = require('fs');
 const {google} = require('googleapis');
 const gmail = google.gmail('v1');
 
+// Instantiates a client
+const secretManagerClient = new SecretManagerServiceClient();
+
+async function accessSecretVersion(secretName) {
+  const projectId  = "lilaobot";
+  const request    = {"name": "projects/" + projectId + "/secrets/" + secretName + "/versions/latest"};
+  const response   = await secretManagerClient.access_secret_version(request);
+
+  // Extract the payload as a string.
+  return response.payload.data.decode("UTF-8");
+}
+
 // Retrieve OAuth2 config
-const clientSecretPath = path.join(path.dirname(__dirname), 'client_secret.json');
-const clientSecretJson = JSON.parse(fs.readFileSync(clientSecretPath));
-const oauth2Client = new google.auth.OAuth2(
-  clientSecretJson.web.client_id,
-  clientSecretJson.web.client_secret,
-  `${config.GCF_BASE_URL}/oauth2callback`
-);
-exports.client = oauth2Client;
+exports.getOAuth2Client = async () => {
+  const oauth2ClientId = accessSecretVersion("oauth2-client-id");
+  const oauth2ClientSecret = accessSecretVersion("oauth2-client-secret");
+
+  return new google.auth.OAuth2(
+    oauth2ClientId,
+    oauth2ClientSecret,
+    `${config.GCF_BASE_URL}/oauth2callback`
+  );
+}
 
 /**
  * Helper function to get the current user's email address
@@ -49,6 +65,8 @@ exports.getEmailAddress = async (t) => {
  * Can fetch current tokens from Datastore, or create new ones
  */
 exports.fetchToken = (emailAddress) => {
+  const oauth2Client = await getOAuth2Client();
+
   return datastore.get(datastore.key(['oauth2Token', emailAddress]))
     .then((tokens) => {
       const token = tokens[0];
@@ -84,6 +102,8 @@ exports.fetchToken = (emailAddress) => {
  * Helper function to save an OAuth 2.0 access token to Datastore
  */
 exports.saveToken = (emailAddress) => {
+  const oauth2Client = await getOAuth2Client();
+
   return datastore.save({
     key: datastore.key(['oauth2Token', emailAddress]),
     data: oauth2Client.credentials
