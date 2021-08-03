@@ -76,7 +76,7 @@ resource "google_cloudfunctions_function_iam_member" "invoker2" {
   project        = google_cloudfunctions_function.gmail_notifier_oauth2init_function.project
   region         = google_cloudfunctions_function.gmail_notifier_oauth2init_function.region
   cloud_function = google_cloudfunctions_function.gmail_notifier_oauth2init_function.name
-  role = "roles/cloudfunctions.invoker"
-  member = "allUsers"
+  role           = "roles/cloudfunctions.invoker"
+  member         = "allUsers"
 }
 
