@@ -58,6 +58,7 @@ resource "google_cloudfunctions_function" "gmail_notifier_oauth2init_function" {
   source_archive_object = google_storage_bucket_object.gmail_notifier_archive_bucket_object.name
   timeout               = 60
   entry_point           = "oauth2init"
+  trigger_http          = true
 }
 
 # IAM entry for all users to invoke the function
