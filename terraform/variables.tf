@@ -12,10 +12,3 @@ variable "gcp_zone" {
 
 variable "function_topic" {
 }
-
-variable "function_entrypoint" {
-}
-
-variable "bucket_archive_filepath" {
-  default = "function_content.zip"
-}
