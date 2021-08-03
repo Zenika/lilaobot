@@ -1,0 +1,35 @@
+{
+  "name": "community-gcf-oauth",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Google LLC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/cloud-functions-gmail-nodejs.git"
+  },
+  "engines": {
+    "node": ">=14.0"
+  },
+  "scripts": {
+    "fix": "semistandard --fix",
+    "lint": "semistandard",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "@google-cloud/datastore": "^6.4.4",
+    "@google-cloud/debug-agent": "^5.2.5",
+    "cheerio": "^1.0.0-rc.10",
+    "googleapis": "^80.0.0",
+    "nconf": "^0.11.3"
+  },
+  "devDependencies": {
+    "mocha": "^8.4.0",
+    "semistandard": "^16.0.1"
+  },
+  "semistandard": {
+    "env": [
+      "mocha"
+    ]
+  }
+}
