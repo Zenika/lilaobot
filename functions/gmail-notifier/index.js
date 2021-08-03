@@ -12,14 +12,15 @@ const helpers = require('./lib/helpers');
  * Only new users (or those who want to refresh
  * their auth data) need visit this page
  */
-exports.oauth2init = (req, res) => {
+exports.oauth2init = async (req, res) => {
   // Define OAuth2 scopes
   const scopes = [
     'https://www.googleapis.com/auth/gmail.readonly'
   ];
 
   // Generate + redirect to OAuth2 consent form URL
-  const authUrl = oauth.client.generateAuthUrl({
+  const oauthClient = await oauth.getOAuth2Client();
+  const authUrl = await oauthClient.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
     prompt: 'consent' // Required in order to receive a refresh token every time
@@ -30,7 +31,7 @@ exports.oauth2init = (req, res) => {
 /**
  * Get an access token from the authorization code and store token in Datastore
  */
-exports.oauth2callback = (req, res) => {
+exports.oauth2callback = async (req, res) => {
   // Get authorization code from request
   const code = req.query.code;
 

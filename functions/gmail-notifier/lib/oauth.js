@@ -11,13 +11,38 @@ const {google} = require('googleapis');
 const gmail = google.gmail('v1');
 
 // Retrieve current GCP project OAuth2 id
-const [oauth2ClientId, oauth2ClientSecret] = await Promise.all(accessSecretVersion("oauth2-client-id"), accessSecretVersion("oauth2-client-secret"));
-const oauth2Client = new google.auth.OAuth2(
+exports.getOAuth2Client = async () => {
+  const oauth2ClientId = "oauth2-client-id";
+  const [secrets] = await secretManagerServiceClient.listSecrets({
+    parent: "projects/lilaobot",
+  });
+  secrets.forEach(secret => {
+      const policy = secret.replication.userManaged
+        ? secret.replication.userManaged
+        : secret.replication.automatic;
+      console.log(`${secret.name} (${policy})`);
+  });
+  const oauth2ClientSecret = await accessSecretVersion("projects/"+config.GCLOUD_PROJECT+"/secrets/"+oauth2ClientId+"/versions/latest");
+  console.info("oauth2ClientSecret: " + oauth2ClientSecret);
+  return new google.auth.OAuth2(
     oauth2ClientId,
     oauth2ClientSecret,
     `${config.GCF_BASE_URL}/oauth2callback`
   );
-exports.client = oauth2Client;
+}
+exports.getOAuth2Client();
+async function accessSecretVersion(secretName) {
+  const request    = {"name": secretName};
+  let response;
+  try{
+    response   = await secretManagerServiceClient.accessSecretVersion(request);
+  } catch (e){
+    console.info("could not access project oauthid version, error: "+e);
+    throw e;
+  }
+  console.info("payload: "+response);
+  return response[0].payload.data.toString('utf8');
+}
 
 async function accessSecretVersion(secretName) {
   const projectId  = config.GCLOUD_PROJECT;
