@@ -15,7 +15,7 @@ data "archive_file" "slack_publisher_archive" {
 
 data "archive_file" "gmail_notifier_archive" {
   type        = "zip"
-  source_dir  = "../functions/gmail_notifier_archive"
+  source_dir  = "../functions/gmail_notifier"
   output_path = "gmail_notifier.zip"
 }
 
