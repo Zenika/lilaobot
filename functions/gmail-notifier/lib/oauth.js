@@ -1,37 +1,32 @@
-/**
- * Copyright 2018, Google LLC
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 'use strict';
 
 const config = require('../config');
 const {Datastore} = require('@google-cloud/datastore');
 const datastore = new Datastore();
+const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
+const secretManagerServiceClient = new SecretManagerServiceClient();
 const path = require('path');
 const fs = require('fs');
 const {google} = require('googleapis');
 const gmail = google.gmail('v1');
 
-// Retrieve OAuth2 config
-const clientSecretPath = path.join(path.dirname(__dirname), 'client_secret.json');
-const clientSecretJson = JSON.parse(fs.readFileSync(clientSecretPath));
+// Retrieve current GCP project OAuth2 id
+const [oauth2ClientId, oauth2ClientSecret] = await Promise.all(accessSecretVersion("oauth2-client-id"), accessSecretVersion("oauth2-client-secret"));
 const oauth2Client = new google.auth.OAuth2(
-  clientSecretJson.web.client_id,
-  clientSecretJson.web.client_secret,
-  `${config.GCF_BASE_URL}/oauth2callback`
-);
+    oauth2ClientId,
+    oauth2ClientSecret,
+    `${config.GCF_BASE_URL}/oauth2callback`
+  );
 exports.client = oauth2Client;
+
+async function accessSecretVersion(secretName) {
+  const projectId  = config.GCLOUD_PROJECT;
+  const request    = {"name": "projects/" + projectId + "/secrets/" + secretName + "/versions/latest"};
+  const response   = await secretManagerClient.access_secret_version(request);
+  // Extract the payload as a string.
+  return response.payload.data.decode("UTF-8");
+}
+
 
 /**
  * Helper function to get the current user's email address
