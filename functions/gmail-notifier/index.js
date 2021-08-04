@@ -34,34 +34,24 @@ exports.oauth2init = async (req, res) => {
 exports.oauth2callback = async (req, res) => {
   // Get authorization code from request
   const code = req.query.code;
-
-  // OAuth2: Exchange authorization code for access token
-  return new Promise((resolve, reject) => {
-    oauth.client.getToken(code, (err, token) =>
-      (err ? reject(err) : resolve(token))
-    );
-  })
-    .then((token) => {
-      // Get user email (to use as a Datastore key)
-      oauth.client.credentials = token;
-      return Promise.all([token, oauth.getEmailAddress()]);
-    })
-    .then(([token, emailAddress]) => {
-      // Store token in Datastore
-      return Promise.all([
-        emailAddress,
-        oauth.saveToken(emailAddress)
-      ]);
-    })
-    .then(([emailAddress]) => {
-      // Respond to request
-      res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
-    })
-    .catch((err) => {
-      // Handle error
-      console.error(err);
-      res.status(500).send('Something went wrong; check the logs.');
+  
+  try {
+    const oAuth2Client = await oauth.getOAuth2Client();
+    const gmailToken = await new Promise((resolve, reject) => {
+      oAuth2Client.getToken(code, (err, token) => (err ? reject(err) : resolve(token))
+      );
     });
+    
+    // Get user email (to use as a Datastore key)
+    const emailAddress = await oauth.getEmailAddress(gmailToken);
+    await oauth.saveToken(emailAddress);
+    // Respond to request
+    res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
+  } catch (err_1) {
+    // Handle error
+    console.error(err_1);
+    res.status(500).send('Something went wrong; check the logs.');
+  }
 };
 
 /**
