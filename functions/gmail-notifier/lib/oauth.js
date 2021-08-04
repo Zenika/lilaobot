@@ -47,7 +47,7 @@ async function accessSecretVersion(secretName) {
 async function accessSecretVersion(secretName) {
   const projectId  = config.GCLOUD_PROJECT;
   const request    = {"name": "projects/" + projectId + "/secrets/" + secretName + "/versions/latest"};
-  const response   = await secretManagerClient.access_secret_version(request);
+  const response   = await secretManagerServiceClient.access_secret_version(request);
   // Extract the payload as a string.
   return response.payload.data.decode("UTF-8");
 }
