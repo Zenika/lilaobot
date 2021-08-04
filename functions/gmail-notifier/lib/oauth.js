@@ -12,18 +12,8 @@ const gmail = google.gmail('v1');
 
 // Retrieve current GCP project OAuth2 id
 const getOAuth2Client = async () => {
-  const [secrets] = await secretManagerServiceClient.listSecrets({
-    parent: "projects/lilaobot",
-  });
-  secrets.forEach(secret => {
-      const policy = secret.replication.userManaged
-        ? secret.replication.userManaged
-        : secret.replication.automatic;
-      console.log(`${secret.name} (${policy})`);
-  });
   const oauth2ClientId = await accessSecretVersion("oauth2-client-id");
   const oauth2ClientSecret = await accessSecretVersion("oauth2-client-secret");
-  console.info("oauth2ClientSecret: " + oauth2ClientSecret);//FIXME delete
   return new google.auth.OAuth2(
     oauth2ClientId,
     oauth2ClientSecret,
@@ -38,10 +28,9 @@ async function accessSecretVersion(secretName) {
   try{
     response   = await secretManagerServiceClient.accessSecretVersion(request);
   } catch (e){
-    console.info("could not access project oauthid version, error: "+e);
+    console.error("could not access project oauthid version, error: "+e);
     throw e;
   }
-  console.info("payload: "+response);
   return response[0].payload.data.toString('utf8');
 }
 
