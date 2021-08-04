@@ -12,7 +12,6 @@ const gmail = google.gmail('v1');
 
 // Retrieve current GCP project OAuth2 id
 exports.getOAuth2Client = async () => {
-  const oauth2ClientId = "oauth2-client-id";
   const [secrets] = await secretManagerServiceClient.listSecrets({
     parent: "projects/lilaobot",
   });
@@ -22,17 +21,18 @@ exports.getOAuth2Client = async () => {
         : secret.replication.automatic;
       console.log(`${secret.name} (${policy})`);
   });
-  const oauth2ClientSecret = await accessSecretVersion("projects/"+config.GCLOUD_PROJECT+"/secrets/"+oauth2ClientId+"/versions/latest");
-  console.info("oauth2ClientSecret: " + oauth2ClientSecret);
+  const oauth2ClientId = await accessSecretVersion("oauth2-client-id");
+  const oauth2ClientSecret = await accessSecretVersion("oauth2-client-secret");
+  console.info("oauth2ClientSecret: " + oauth2ClientSecret);//FIXME delete
   return new google.auth.OAuth2(
     oauth2ClientId,
     oauth2ClientSecret,
     `${config.GCF_BASE_URL}/oauth2callback`
   );
 }
-exports.getOAuth2Client();
+
 async function accessSecretVersion(secretName) {
-  const request    = {"name": secretName};
+  const request    = {"name": "projects/"+config.GCLOUD_PROJECT+"/secrets/"+secretName+"/versions/latest"};
   let response;
   try{
     response   = await secretManagerServiceClient.accessSecretVersion(request);
@@ -42,14 +42,6 @@ async function accessSecretVersion(secretName) {
   }
   console.info("payload: "+response);
   return response[0].payload.data.toString('utf8');
-}
-
-async function accessSecretVersion(secretName) {
-  const projectId  = config.GCLOUD_PROJECT;
-  const request    = {"name": "projects/" + projectId + "/secrets/" + secretName + "/versions/latest"};
-  const response   = await secretManagerServiceClient.access_secret_version(request);
-  // Extract the payload as a string.
-  return response.payload.data.decode("UTF-8");
 }
 
 
