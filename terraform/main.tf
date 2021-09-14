@@ -53,7 +53,7 @@ resource "google_cloudfunctions_function" "gmail_notifier_oauth2init_function" {
   description = "gmail-notifier entry point, will redirect to auth page (Google OpenID connect)"
   runtime     = "nodejs14"
 
-  available_memory_mb   = 128
+  available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.functions_bucket.name
   source_archive_object = google_storage_bucket_object.gmail_notifier_archive_bucket_object.name
   timeout               = 60
@@ -66,11 +66,24 @@ resource "google_cloudfunctions_function" "gmail_notifier_oauth2callback_functio
   description = "redirection callback after user auth"
   runtime     = "nodejs14"
 
-  available_memory_mb   = 128
+  available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.functions_bucket.name
   source_archive_object = google_storage_bucket_object.gmail_notifier_archive_bucket_object.name
   timeout               = 60
   entry_point           = "oauth2callback"
+  trigger_http          = true
+}
+
+resource "google_cloudfunctions_function" "gmail_notifier_initWatch_function" {
+  name        = "initWatch"
+  description = "init watch on given gmail inbox"
+  runtime     = "nodejs14"
+
+  available_memory_mb   = 256
+  source_archive_bucket = google_storage_bucket.functions_bucket.name
+  source_archive_object = google_storage_bucket_object.gmail_notifier_archive_bucket_object.name
+  timeout               = 60
+  entry_point           = "initWatch"
   trigger_http          = true
 }
 
@@ -97,6 +110,14 @@ resource "google_cloudfunctions_function_iam_member" "callback_allusers_permissi
   project        = google_cloudfunctions_function.gmail_notifier_oauth2callback_function.project
   region         = google_cloudfunctions_function.gmail_notifier_oauth2callback_function.region
   cloud_function = google_cloudfunctions_function.gmail_notifier_oauth2callback_function.name
+  role           = "roles/cloudfunctions.invoker"
+  member         = "allUsers"
+}
+
+resource "google_cloudfunctions_function_iam_member" "initWatch_allusers_permission" {
+  project        = google_cloudfunctions_function.gmail_notifier_initWatch_function.project
+  region         = google_cloudfunctions_function.gmail_notifier_initWatch_function.region
+  cloud_function = google_cloudfunctions_function.gmail_notifier_initWatch_function.name
   role           = "roles/cloudfunctions.invoker"
   member         = "allUsers"
 }
