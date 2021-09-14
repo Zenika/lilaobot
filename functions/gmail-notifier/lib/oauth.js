@@ -38,9 +38,8 @@ async function accessSecretVersion(secretName) {
 /**
  * Helper function to get the current user's email address
  */
- exports.getEmailAddress = async (token) => {
-  const oauth2Client = await getOAuth2Client();
-  oauth2Client.credentials = token;
+ exports.getEmailAddress = async (oauth2Client, tokenResponse) => {
+  oauth2Client.setCredentials(tokenResponse.tokens);
   return gmail.users.getProfile({
     auth: oauth2Client,
     userId: 'me'
