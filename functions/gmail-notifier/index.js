@@ -36,10 +36,11 @@ exports.oauth2callback = async (req, res) => {
     const lilaobotOAuthClient = await oauth.getOAuth2Client();
 
     const userAccountTokenResponse = await lilaobotOAuthClient.getToken(code);
-    
+    lilaobotOAuthClient.setCredentials(userAccountTokenResponse.tokens);
+
     // Get user email (to use as a Datastore key)
-    const emailAddress = await oauth.getEmailAddress(lilaobotOAuthClient, userAccountTokenResponse);
-    await oauth.saveToken(emailAddress);
+    const emailAddress = await oauth.getEmailAddress(lilaobotOAuthClient);
+    await oauth.saveToken(emailAddress, lilaobotOAuthClient);
     // Respond to request
     return res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
   } catch (err_1) {

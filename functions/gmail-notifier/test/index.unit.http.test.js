@@ -43,6 +43,7 @@ describe("test gmail-notifier functions", () => {
       getToken: function (code, callback) {
         return { some: "dummy token" };
       },
+      setCredentials: function(param){}
     });
     sandbox
       .stub(oauthLibrary, "getEmailAddress")

@@ -36,8 +36,7 @@ async function accessSecretVersion(secretName) {
 /**
  * Helper function to get the current user's email address
  */
- exports.getEmailAddress = async (oauth2Client, tokenResponse) => {
-  oauth2Client.setCredentials(tokenResponse.tokens);
+ exports.getEmailAddress = async (oauth2Client) => {
   return gmail.users.getProfile({
     auth: oauth2Client,
     userId: 'me'
@@ -65,9 +64,9 @@ exports.watchGmailInbox = async (oauth2Client) => {
  * Can fetch current tokens from Datastore, or create new ones
  */
 exports.fetchToken = async (emailAddress) => {
-  const oauth2Client = getOAuth2Client();
-  const tokens = datastore.get(datastore.key(['oauth2Token', emailAddress]));
-  console.debug(`fetched token from datastore: ${JSON.stringify(token)}`);
+  const oauth2Client = await getOAuth2Client();
+  const tokens = await datastore.get(datastore.key(['oauth2Token', emailAddress]));
+  console.debug(`fetched token from datastore: ${JSON.stringify(tokens)}`);
   const token = tokens[0];
   
   // Check for new users
@@ -92,13 +91,9 @@ exports.fetchToken = async (emailAddress) => {
 /**
  * Helper function to save an OAuth 2.0 access token to Datastore
  */
-exports.saveToken = async (emailAddress, token) => {
-  const oauth2Client = await getOAuth2Client();
-
+exports.saveToken = async (emailAddress, oauth2Client) => {
   return datastore.save({
     key: datastore.key(['oauth2Token', emailAddress]),
-    data: {
-      token: token,
-    }
+    data: oauth2Client.credentials
   });
 };
