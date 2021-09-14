@@ -26,6 +26,12 @@ Terraform state is saved in a Google Cloud Storage named `lilaobot-terraform-sta
     - GCP_SA_KEY (service account credentials, a JSON file)
     - GCP_PROJECT (project id)
 
+## Resources
+This project is based on [this article from Google](https://cloud.google.com/blog/products/application-development/adding-custom-intelligence-to-gmail-with-serverless-on-gcp), without the image part.
+
+Below, the goal of this actual project:
+![Lilaobot architechure diagram](./doc/lilaobot-architecture-diagram.png "Lilaobot architecture diagram")
+
 
 ## Author
 
