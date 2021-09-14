@@ -53,8 +53,8 @@ async function accessSecretVersion(secretName) {
  * Can fetch current tokens from Datastore, or create new ones
  */
 exports.fetchToken = async (emailAddress) => {
-
-  const [oauth2Client, tokens] = await Promise.all(getOAuth2Client(), datastore.get(datastore.key(['oauth2Token', emailAddress])));
+  const oauth2Client = getOAuth2Client();
+  const tokens = datastore.get(datastore.key(['oauth2Token', emailAddress]));
   const token = tokens[0];
   // Check for new users
   if (!token) {
@@ -64,31 +64,27 @@ exports.fetchToken = async (emailAddress) => {
   if (!token.expiry_date || token.expiry_date < Date.now() + 60000) {
     oauth2Client.credentials.refresh_token =
       oauth2Client.credentials.refresh_token || token.refresh_token;
-    return new Promise((resolve, reject) => {
-      oauth2Client.refreshAccessToken((err, response) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve();
-      });
-    })
-      .then(() => {
-        return exports.saveToken(emailAddress);
-      });
+    
+    await oauth2Client.refreshAccessToken();
+    await exports.saveToken(emailAddress, token);
+    return oauth2Client;
+
   } else {
     oauth2Client.credentials = token;
-    return Promise.resolve();
+    return oauth2Client;
   }
 };
 
 /**
  * Helper function to save an OAuth 2.0 access token to Datastore
  */
-exports.saveToken = async (emailAddress) => {
+exports.saveToken = async (emailAddress, token) => {
   const oauth2Client = await getOAuth2Client();
 
   return datastore.save({
     key: datastore.key(['oauth2Token', emailAddress]),
-    data: oauth2Client.credentials
+    data: {
+      token: token,
+    }
   });
 };
