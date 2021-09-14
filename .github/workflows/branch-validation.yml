@@ -6,13 +6,25 @@ on:
       - main
 
 jobs:
+  functions-test:
+    name: Test NodeJS functions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: NodeJS tests
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: cd functions/gmail-notifier && npm install
+      - run: cd functions/gmail-notifier && npm test
+
   validate:
     runs-on: ubuntu-latest
     name: Validate terraform configuration
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: terraform validate
         uses: dflook/terraform-validate@v1
         with:
