@@ -19,8 +19,8 @@ exports.oauth2init = async (req, res) => {
   ];
 
   // Generate + redirect to OAuth2 consent form URL
-  const oauthClient = await oauth.getOAuth2Client();
-  const authUrl = oauthClient.generateAuthUrl({
+  const lilaobotOAuthClient = await oauth.getOAuth2Client();
+  const authUrl = lilaobotOAuthClient.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
     prompt: 'consent' // Required in order to receive a refresh token every time
@@ -35,12 +35,12 @@ exports.oauth2callback = async (req, res) => {
   // Get authorization code from request
   const code = req.query.code;
   try {
-    const oAuth2Client = await oauth.getOAuth2Client();
+    const lilaobotOAuthClient = await oauth.getOAuth2Client();
 
-    const userAccountToken = await oAuth2Client.getToken(code);
+    const userAccountTokenResponse = await lilaobotOAuthClient.getToken(code);
     
     // Get user email (to use as a Datastore key)
-    const emailAddress = await oauth.getEmailAddress(userAccountToken);
+    const emailAddress = await oauth.getEmailAddress(lilaobotOAuthClient, userAccountTokenResponse);
     await oauth.saveToken(emailAddress);
     // Respond to request
     return res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);

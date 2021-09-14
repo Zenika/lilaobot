@@ -44,8 +44,9 @@ describe('test gmail-notifier functions', () => {
     sandbox.stub(oauthLibrary, "saveToken");
     sandbox.stub(oauthLibrary, "getOAuth2Client").returns(
       {
+        some: "dummy client",
         getToken : function(code, callback) {
-          return {}
+          return {some: "dummy token"}
         }
       }
     );
