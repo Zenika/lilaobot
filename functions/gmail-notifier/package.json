@@ -14,7 +14,7 @@
   "scripts": {
     "fix": "semistandard --fix",
     "lint": "semistandard",
-    "test": "mocha"
+    "test": "mocha test/*test.js --timeout=6000 --exit"
   },
   "dependencies": {
     "@google-cloud/datastore": "^6.4.4",
@@ -22,7 +22,8 @@
     "@google-cloud/secret-manager": "^3.9.0",
     "cheerio": "^1.0.0-rc.10",
     "googleapis": "^80.0.0",
-    "nconf": "^0.11.3"
+    "nconf": "^0.11.3",
+    "sinon": "^11.1.2"
   },
   "devDependencies": {
     "mocha": "^8.4.0",

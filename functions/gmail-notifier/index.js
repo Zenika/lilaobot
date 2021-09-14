@@ -20,7 +20,7 @@ exports.oauth2init = async (req, res) => {
 
   // Generate + redirect to OAuth2 consent form URL
   const oauthClient = await oauth.getOAuth2Client();
-  const authUrl = await oauthClient.generateAuthUrl({
+  const authUrl = oauthClient.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
     prompt: 'consent' // Required in order to receive a refresh token every time
@@ -34,40 +34,27 @@ exports.oauth2init = async (req, res) => {
 exports.oauth2callback = async (req, res) => {
   // Get authorization code from request
   const code = req.query.code;
+  try {
+    const oAuth2Client = await oauth.getOAuth2Client();
 
-  // OAuth2: Exchange authorization code for access token
-  return new Promise((resolve, reject) => {
-    oauth.client.getToken(code, (err, token) =>
-      (err ? reject(err) : resolve(token))
-    );
-  })
-    .then((token) => {
-      // Get user email (to use as a Datastore key)
-      oauth.client.credentials = token;
-      return Promise.all([token, oauth.getEmailAddress()]);
-    })
-    .then(([token, emailAddress]) => {
-      // Store token in Datastore
-      return Promise.all([
-        emailAddress,
-        oauth.saveToken(emailAddress)
-      ]);
-    })
-    .then(([emailAddress]) => {
-      // Respond to request
-      res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
-    })
-    .catch((err) => {
-      // Handle error
-      console.error(err);
-      res.status(500).send('Something went wrong; check the logs.');
-    });
+    const userAccountToken = await oAuth2Client.getToken(code);
+    
+    // Get user email (to use as a Datastore key)
+    const emailAddress = await oauth.getEmailAddress(userAccountToken);
+    await oauth.saveToken(emailAddress);
+    // Respond to request
+    return res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
+  } catch (err_1) {
+    // Handle error
+    console.error(err_1);
+    return res.status(500).send('Something went wrong; ' + JSON.stringify(err_1));
+  }
 };
 
 /**
  * Initialize a watch on the user's inbox
  */
-exports.initWatch = (req, res) => {
+exports.initWatch = async (req, res) => {
   // Require a valid email address
   if (!req.query.emailAddress) {
     return res.status(400).send('No emailAddress specified.');
@@ -78,32 +65,21 @@ exports.initWatch = (req, res) => {
   }
 
   // Retrieve the stored OAuth 2.0 access token
-  return oauth.fetchToken(email)
-    .then(() => {
-      // Initialize a watch
-      gmail.users.watch({
-        auth: oauth.client,
-        userId: 'me',
-        resource: {
-          labelIds: ['INBOX'],
-          topicName: config.TOPIC_NAME
-        }
-      });
-    })
-    .then(() => {
-      // Respond with status
-      res.write('Watch initialized!');
-      res.status(200).end();
-    })
-    .catch((err) => {
-      // Handle errors
-      if (err.message === config.UNKNOWN_USER_MESSAGE) {
-        res.redirect('/oauth2init');
-      } else {
-        console.error(err);
-        res.status(500).send('Something went wrong; check the logs.');
-      }
-    });
+  const oatuhClient = await oauth.fetchToken(email)
+
+  await gmail.users.watch({
+    auth: oatuhClient,
+    userId: 'me',
+    resource: {
+      labelIds: ['INBOX'],
+      topicName: config.TOPIC_NAME
+    }
+  });
+  
+  // Respond with status
+  res.write('Watch initialized!');
+  res.status(200).end();
+
 };
 
 /**
