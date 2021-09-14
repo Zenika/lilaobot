@@ -5,8 +5,6 @@ const {Datastore} = require('@google-cloud/datastore');
 const datastore = new Datastore();
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const secretManagerServiceClient = new SecretManagerServiceClient();
-const path = require('path');
-const fs = require('fs');
 const {google} = require('googleapis');
 const gmail = google.gmail('v1');
 
@@ -48,13 +46,30 @@ async function accessSecretVersion(secretName) {
 };
 
 /**
+ * Helper function to trigger a watch on a gmail inbox,
+ * this is a feature from gmail, it will forward incoming mails to the Pub/Sub topic
+ */
+exports.watchGmailInbox = async (oauth2Client) => {
+  return gmail.users.watch({
+    auth: oauth2Client,
+    userId: 'me',
+    resource: {
+      labelIds: ['INBOX'],
+      topicName: config.TOPIC_NAME
+    }
+  });
+}
+
+/**
  * Helper function to fetch a user's OAuth 2.0 access token
  * Can fetch current tokens from Datastore, or create new ones
  */
 exports.fetchToken = async (emailAddress) => {
   const oauth2Client = getOAuth2Client();
   const tokens = datastore.get(datastore.key(['oauth2Token', emailAddress]));
+  console.debug(`fetched token from datastore: ${JSON.stringify(token)}`);
   const token = tokens[0];
+  
   // Check for new users
   if (!token) {
     throw new Error(config.UNKNOWN_USER_MESSAGE);

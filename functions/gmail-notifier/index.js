@@ -1,7 +1,5 @@
 'use strict';
 
-var {google} = require('googleapis');
-const gmail = google.gmail('v1');
 const querystring = require('querystring');
 const config = require('./config');
 const oauth = require('./lib/oauth');
@@ -47,7 +45,7 @@ exports.oauth2callback = async (req, res) => {
   } catch (err_1) {
     // Handle error
     console.error(err_1);
-    return res.status(500).send('Something went wrong; ' + JSON.stringify(err_1));
+    return res.status(500).send('Something went wrong; ' + err_1);
   }
 };
 
@@ -61,29 +59,23 @@ exports.initWatch = async (req, res) => {
   }
   const email = querystring.unescape(req.query.emailAddress);
   if (!email.includes('@')) {
-    return res.status(400).send('Invalid emailAddress.');
+    return res.status(400).send(`Invalid emailAddress, it was: ${email}`);
   }
+
+  console.info(`starting initWatch for email: ${email}`)
 
   // Retrieve the stored OAuth 2.0 access token
   const oatuhClient = await oauth.fetchToken(email)
 
-  await gmail.users.watch({
-    auth: oatuhClient,
-    userId: 'me',
-    resource: {
-      labelIds: ['INBOX'],
-      topicName: config.TOPIC_NAME
-    }
-  });
+  await oauth.watchGmailInbox(oatuhClient);
   
   // Respond with status
-  res.write('Watch initialized!');
-  res.status(200).end();
-
+  return res.send(`Watch initialized on gmail inbox: ${email}`);
 };
 
 /**
 * Process new messages as they are received
+* WIP, not implemented
 */
 exports.onNewMessage = (message, context) => {
   // Parse the Pub/Sub message
