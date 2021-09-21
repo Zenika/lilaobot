@@ -87,6 +87,22 @@ resource "google_cloudfunctions_function" "gmail_notifier_initWatch_function" {
   trigger_http          = true
 }
 
+resource "google_cloudfunctions_function" "gmail_notifier_onNewMessage_function" {
+  name        = "onNewMessage"
+  description = "onNewMessage on given gmail inbox"
+  runtime     = "nodejs14"
+
+  available_memory_mb   = 256
+  source_archive_bucket = google_storage_bucket.functions_bucket.name
+  source_archive_object = google_storage_bucket_object.gmail_notifier_archive_bucket_object.name
+  timeout               = 60
+  entry_point           = "onNewMessage"
+  event_trigger {
+    event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
+    resource   = "projects/${var.gcp_project}/topics/${var.function_topic}"
+  }
+}
+
 # IAM entry for all users to invoke the function
 resource "google_cloudfunctions_function_iam_member" "invoker" {
   project        = google_cloudfunctions_function.slack_publisher_function.project
@@ -118,6 +134,14 @@ resource "google_cloudfunctions_function_iam_member" "initWatch_allusers_permiss
   project        = google_cloudfunctions_function.gmail_notifier_initWatch_function.project
   region         = google_cloudfunctions_function.gmail_notifier_initWatch_function.region
   cloud_function = google_cloudfunctions_function.gmail_notifier_initWatch_function.name
+  role           = "roles/cloudfunctions.invoker"
+  member         = "allUsers"
+}
+
+resource "google_cloudfunctions_function_iam_member" "onNewMessage_allusers_permission" {
+  project        = google_cloudfunctions_function.gmail_notifier_onNewMessage_function.project
+  region         = google_cloudfunctions_function.gmail_notifier_onNewMessage_function.region
+  cloud_function = google_cloudfunctions_function.gmail_notifier_onNewMessage_function.name
   role           = "roles/cloudfunctions.invoker"
   member         = "allUsers"
 }
