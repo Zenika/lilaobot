@@ -84,12 +84,11 @@ exports.onNewMessage = async (message, context) => {
   // Parse the Pub/Sub message
   const dataStr = Buffer.from(message.data, 'base64').toString()
   const dataObj = JSON.parse(dataStr)
-  console.info(`incoming message: ${dataObj}`)
+  console.info(`incoming message: ${dataStr}`)
+  const oauth2Client = await oauth.fetchToken(dataObj.emailAddress)
 
-  return oauth
-    .fetchToken(dataObj.emailAddress)
-    .then(() => gmailAPIClient.listMessages())
-    .then((res) => gmailAPIClient.getMessageById(res.messages[0].id)) // TODO: foreach
+  return gmailAPIClient.listMessages(oauth2Client)
+    .then((res) => gmailAPIClient.getMessageById(oauth2Client, res.messages[0].id)) // TODO: foreach
     .then((message) => {
       console.info(message)
       return message
