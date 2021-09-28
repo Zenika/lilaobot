@@ -1,5 +1,3 @@
-const { useFakeServer } = require('sinon')
-
 describe('test gmail-api-client', () => {
   const assert = require('assert')
   const sinon = require('sinon')

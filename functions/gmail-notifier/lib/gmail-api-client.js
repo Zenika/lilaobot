@@ -17,6 +17,7 @@
 
 const { google } = require('googleapis')
 const gmail = google.gmail('v1')
+const config = require('../config')
 
 /**
  * Helper function to get the current user's email address

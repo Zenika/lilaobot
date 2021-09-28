@@ -91,7 +91,7 @@ exports.onNewMessage = async (message, context) => {
     .then(() => gmailAPIClient.listMessages())
     .then((res) => gmailAPIClient.getMessageById(res.messages[0].id)) // TODO: foreach
     .then((message) => {
-      console.log(message)
+      console.info(message)
       return message
     })
     .catch((err) => {
