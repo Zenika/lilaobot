@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
-const querystring = require('querystring');
-const config = require('./config');
-const oauth = require('./lib/oauth');
-const helpers = require('./lib/helpers');
+const querystring = require('querystring')
+const config = require('./config')
+const oauth = require('./lib/oauth')
+const gmailAPIClient = require('./lib/gmail-api-client')
 
 /**
  * Request an OAuth 2.0 authorization code
@@ -12,43 +12,45 @@ const helpers = require('./lib/helpers');
  */
 exports.oauth2init = async (req, res) => {
   // Define OAuth2 scopes
-  const scopes = [
-    'https://www.googleapis.com/auth/gmail.readonly'
-  ];
+  const scopes = ['https://www.googleapis.com/auth/gmail.readonly']
 
   // Generate + redirect to OAuth2 consent form URL
-  const lilaobotOAuthClient = await oauth.getOAuth2Client();
+  const lilaobotOAuthClient = await oauth.getOAuth2Client()
   const authUrl = lilaobotOAuthClient.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
     prompt: 'consent' // Required in order to receive a refresh token every time
-  });
-  return res.redirect(authUrl);
-};
+  })
+  return res.redirect(authUrl)
+}
 
 /**
  * Get an access token from the authorization code and store token in Datastore
  */
 exports.oauth2callback = async (req, res) => {
   // Get authorization code from request
-  const code = req.query.code;
+  const code = req.query.code
   try {
-    const lilaobotOAuthClient = await oauth.getOAuth2Client();
+    const lilaobotOAuthClient = await oauth.getOAuth2Client()
 
-    const userAccountTokenResponse = await lilaobotOAuthClient.getToken(code);
-    lilaobotOAuthClient.setCredentials(userAccountTokenResponse.tokens);
+    const userAccountTokenResponse = await lilaobotOAuthClient.getToken(code)
+    lilaobotOAuthClient.setCredentials(userAccountTokenResponse.tokens)
 
     // Get user email (to use as a Datastore key)
-    const emailAddress = await oauth.getEmailAddress(lilaobotOAuthClient);
-    await oauth.saveToken(emailAddress, lilaobotOAuthClient);
+    const emailAddress = await gmailAPIClient.getEmailAddress(
+      lilaobotOAuthClient
+    )
+    await oauth.saveToken(emailAddress, lilaobotOAuthClient)
     // Respond to request
-    return res.redirect(`/initWatch?emailAddress=${querystring.escape(emailAddress)}`);
+    return res.redirect(
+      `/initWatch?emailAddress=${querystring.escape(emailAddress)}`
+    )
   } catch (err_1) {
     // Handle error
-    console.error(err_1);
-    return res.status(500).send('Something went wrong; ' + err_1);
+    console.error(err_1)
+    return res.status(500).send('Something went wrong; ' + err_1)
   }
-};
+}
 
 /**
  * Initialize a watch on the user's inbox
@@ -56,11 +58,11 @@ exports.oauth2callback = async (req, res) => {
 exports.initWatch = async (req, res) => {
   // Require a valid email address
   if (!req.query.emailAddress) {
-    return res.status(400).send('No emailAddress specified.');
+    return res.status(400).send('No emailAddress specified.')
   }
-  const email = querystring.unescape(req.query.emailAddress);
+  const email = querystring.unescape(req.query.emailAddress)
   if (!email.includes('@')) {
-    return res.status(400).send(`Invalid emailAddress, it was: ${email}`);
+    return res.status(400).send(`Invalid emailAddress, it was: ${email}`)
   }
 
   console.info(`starting initWatch for email: ${email}`)
@@ -68,29 +70,34 @@ exports.initWatch = async (req, res) => {
   // Retrieve the stored OAuth 2.0 access token
   const oatuhClient = await oauth.fetchToken(email)
 
-  await oauth.watchGmailInbox(oatuhClient);
-  
+  await gmailAPIClient.watchGmailInbox(oatuhClient)
+
   // Respond with status
-  return res.send(`Watch initialized on gmail inbox: ${email}`);
-};
+  return res.send(`Watch initialized on gmail inbox: ${email}`)
+}
 
 /**
-* Process new messages as they are received
-* WIP, not implemented
-*/
-exports.onNewMessage = (message, context) => {
+ * Process new messages as they are received
+ * WIP, not implemented
+ */
+exports.onNewMessage = async (message, context) => {
   // Parse the Pub/Sub message
-  const dataStr = Buffer.from(message.data, 'base64').toString();
-  const dataObj = JSON.parse(dataStr);
+  const dataStr = Buffer.from(message.data, 'base64').toString()
+  const dataObj = JSON.parse(dataStr)
+  console.info(`incoming message: ${dataObj}`)
 
-  return oauth.fetchToken(dataObj.emailAddress)
-    .then(() => helpers.listMessageIds())
-    .then(res => helpers.getMessageById(res.data.messages[0].id)) // TODO: foreach
-    .then(res => console.log(res))
+  return oauth
+    .fetchToken(dataObj.emailAddress)
+    .then(() => gmailAPIClient.listMessages())
+    .then((res) => gmailAPIClient.getMessageById(res.messages[0].id)) // TODO: foreach
+    .then((message) => {
+      console.log(message)
+      return message
+    })
     .catch((err) => {
       // Handle unexpected errors
       if (!err.message || err.message !== config.NO_LABEL_MATCH) {
-        console.error(err);
+        console.error(err)
       }
-    });
-};
+    })
+}

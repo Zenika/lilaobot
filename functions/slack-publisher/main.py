@@ -25,10 +25,12 @@ def publishToSlack(event, context):
     pubsub_message = base64.b64decode(event['data']).decode('utf-8')
 
     try:
-      response = client.chat_postMessage(
-          channel="C021BGBSMFY",
-          text="Message received from Pub/sub: " + str(pubsub_message)
-      )
+      print("Message received from Pub/sub: " + str(pubsub_message))
+      # FIXME temporary disable sending to slack, for dev tests
+      #response = client.chat_postMessage(
+      #    channel="C021BGBSMFY",
+      #    text="Message received from Pub/sub: " + str(pubsub_message)
+      #)
     except SlackApiError as e:
         # You will get a SlackApiError if "ok" is False
         assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
