@@ -85,7 +85,7 @@ exports.onNewMessage = async (message, context) => {
   const dataStr = Buffer.from(message.data, 'base64').toString()
   const dataObj = JSON.parse(dataStr)
   console.info(`incoming message: ${dataStr}`)
-  const oauth2Client = await oauth.fetchToken(email)
+  const oauth2Client = await oauth.fetchToken(dataObj.emailAddress)
 
   return gmailAPIClient.listMessages(oauth2Client)
     .then((res) => gmailAPIClient.getMessageById(oauth2Client, res.messages[0].id)) // TODO: foreach
