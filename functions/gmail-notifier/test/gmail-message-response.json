@@ -1,0 +1,27 @@
+{
+    "id": "1234",
+    "threadId": "string",
+    "labelIds": ["string"],
+    "snippet": "string",
+    "historyId": "string",
+    "internalDate": "string",
+    "payload": {
+      "partId": "string",
+      "mimeType": "string",
+      "filename": "string",
+      "headers": [
+        {
+          "name": "string",
+          "value": "string"
+        }
+      ],
+      "body": {
+        "attachmentId": "string",
+        "size": 1,
+        "data": "some data"
+      },
+      "parts": []
+    },
+    "sizeEstimate": 1,
+    "raw": "string"
+  }
