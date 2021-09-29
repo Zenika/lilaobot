@@ -88,10 +88,17 @@ exports.onNewMessage = async (message, context) => {
   const oauth2Client = await oauth.fetchToken(dataObj.emailAddress)
 
   return gmailAPIClient.listMessages(oauth2Client)
-    .then((res) => gmailAPIClient.getMessageById(oauth2Client, res.messages[0].id)) // TODO: foreach
-    .then((message) => {
-      console.info(message)
-      return message
+    .then((res) => gmailAPIClient.getMessageById(oauth2Client, res.data.messages[0].id)) // TODO: foreach
+    .then((messageResponse) => {
+      console.log('message data > ' + JSON.stringify(messageResponse.data))
+      console.log('snippet > ' + messageResponse.data.snippet)
+
+      messageResponse.data.payload.parts.forEach((part) =>{
+        console.log('part > ' + JSON.stringify(part))
+        console.log('part infos > ' + part.partId + " " + part.mimeType)
+        console.log('part body > ' + JSON.stringify(Buffer.from(part.body.data, 'base64').toString('utf8')))
+      })
+      return messageResponse
     })
     .catch((err) => {
       // Handle unexpected errors

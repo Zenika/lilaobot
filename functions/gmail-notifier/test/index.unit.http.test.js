@@ -88,9 +88,9 @@ describe('test gmail-notifier functions', () => {
   it('onNewMessage: should received message from Pub/sub and retreive email content', async () => {
     // given
     sandbox.stub(oauthLibrary, 'fetchToken').returns(Promise.resolve())
-    sandbox.stub(gmailAPIClient, 'listMessages').returns(Promise.resolve({ messages: [{ id: '1234' }] }))
+    sandbox.stub(gmailAPIClient, 'listMessages').returns(Promise.resolve({data: { messages: [{ id: '1234' }] }}))
     const gmailMessage = require('./gmail-message-response.json')
-    sandbox.stub(gmailAPIClient, 'getMessageById').returns(gmailMessage)
+    sandbox.stub(gmailAPIClient, 'getMessageById').returns({data: gmailMessage})
 
     const message = {
       // from https://developers.google.com/gmail/api/guides/push#watch_response
@@ -106,6 +106,6 @@ describe('test gmail-notifier functions', () => {
     const result = await onNewMessage(message)
 
     // then
-    assert.match(result.payload.body.data, /some data/)
+    assert.match(result.data.payload.body.data, /some data/)
   })
 })
