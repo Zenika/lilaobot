@@ -45,18 +45,20 @@ exports.fetchToken = async (emailAddress) => {
   if (!token) {
     throw new Error(config.UNKNOWN_USER_MESSAGE)
   }
-  // Validate token
-  if (!token.expiry_date || token.expiry_date < Date.now() + 60000) {
-    oauth2Client.credentials.refresh_token =
-      oauth2Client.credentials.refresh_token || token.refresh_token
+  // // Validate token
+  // if (!token.expiry_date || token.expiry_date < Date.now() + 60000) {
+  //   oauth2Client.credentials.refresh_token =
+  //     oauth2Client.credentials.refresh_token || token.refresh_token
 
-    await oauth2Client.refreshAccessToken()
-    await exports.saveToken(emailAddress, token)
-    return oauth2Client
-  } else {
-    oauth2Client.credentials = token
-    return oauth2Client
-  }
+  //   await oauth2Client.refreshAccessToken()
+  //   await exports.saveToken(emailAddress, token)
+  //   return oauth2Client
+  // } else {
+  //   oauth2Client.credentials = token
+  //   return oauth2Client
+  // }
+  oauth2Client.credentials = token
+  return oauth2Client
 }
 
 /**

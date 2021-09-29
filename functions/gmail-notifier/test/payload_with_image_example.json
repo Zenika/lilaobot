@@ -1,0 +1,63 @@
+[
+  {
+    "partId": "0",
+    "mimeType": "multipart/alternative",
+    "filename": "",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "multipart/alternative; boundary=\"000000000000f63ee805cd1f8b8b\""
+      }
+    ],
+    "body": { "size": 0 },
+    "parts": [
+      {
+        "partId": "0.0",
+        "mimeType": "text/plain",
+        "filename": "",
+        "headers": [
+          { "name": "Content-Type", "value": "text/plain; charset=\"UTF-8\"" }
+        ],
+        "body": {
+          "size": 120,
+          "data": "SGVsbG8sDQp3ZSBhcmUgc2Vla2luZyB0byBoaXJlIGFuIGV4cGVyaWVuY2VkIGRldm9wcy4NCmluZm9zIGFyZSBpbiB0aGUgYXR0YWNobWVudC4NCg0KSGF2ZSBhIG5pY2UgZGF5Lg0KU29tZSBjb21wYW55Lg0K"
+        }
+      },
+      {
+        "partId": "0.1",
+        "mimeType": "text/html",
+        "filename": "",
+        "headers": [
+          { "name": "Content-Type", "value": "text/html; charset=\"UTF-8\"" },
+          { "name": "Content-Transfer-Encoding", "value": "quoted-printable" }
+        ],
+        "body": {
+          "size": 212,
+          "data": "PGRpdiBkaXI9Imx0ciI-SGVsbG8swqA8ZGl2PndlIGFyZSBzZWVraW5nIHRvIGhpcmUgYW4gZXhwZXJpZW5jZWQgZGV2b3BzLjwvZGl2PjxkaXY-aW5mb3MgYXJlIGluIHRoZcKgYXR0YWNobWVudC48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkhhdmUgYSBuaWNlIGRheS48L2Rpdj48ZGl2PlNvbWUgY29tcGFueS48L2Rpdj48ZGl2Pjxicj48YnI-PC9kaXY-PC9kaXY-DQo="
+        }
+      }
+    ]
+  },
+  {
+    "partId": "1",
+    "mimeType": "application/octet-stream",
+    "filename": "yaml_horse.jpg_large",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/octet-stream; name=\"yaml_horse.jpg_large\""
+      },
+      {
+        "name": "Content-Disposition",
+        "value": "attachment; filename=\"yaml_horse.jpg_large\""
+      },
+      { "name": "Content-Transfer-Encoding", "value": "base64" },
+      { "name": "X-Attachment-Id", "value": "f_ku5cls520" },
+      { "name": "Content-ID", "value": "<f_ku5cls520>" }
+    ],
+    "body": {
+      "attachmentId": "ANGjdJ_POokTKZeC2QNlRX4H11aBx9YrtpMM6Hd8PWq_DMCm60loy5RzIQTOWBBDDI5BojO242EKADKLtKsYIzIEJbqJlHgGF5R7gfnG4MrI0Dl8krd3DF-1nqMh0U24IibdwRnQY-TM110zVd0Tcm5B1IgaDFJVjCNEKXKf6DHkN5mQ6AiqYk34eYCWGqDmQpxTj_-rvyzdKvHTGwlFO-7IER5dy1MP2cAfGFsztg",
+      "size": 67664
+    }
+  }
+]
