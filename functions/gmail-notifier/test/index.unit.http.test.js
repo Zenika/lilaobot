@@ -1,10 +1,26 @@
-describe('test gmail-notifier functions', () => {
-  const assert = require('assert')
-  const sinon = require('sinon')
-  const { oauth2init, oauth2callback, initWatch, onNewMessage } = require('..')
-  const oauthLibrary = require('../lib/oauth')
-  const gmailAPIClient = require('../lib/gmail-api-client')
+const assert = require('assert')
+const sinon = require('sinon')
+const { oauth2init, oauth2callback, initWatch, onNewMessage } = require('..')
+const oauthLibrary = require('../lib/oauth')
+const gmailAPIClient = require('../lib/gmail-api-client')
 
+
+function setupInitWatch(query){
+  // mock dependencies
+  sandbox.stub(oauthLibrary, 'fetchToken')
+  sandbox.stub(gmailAPIClient, 'watchGmailInbox')
+
+  // Mock ExpressJS 'req' and 'res' parameters
+  const req = { query }
+  const res = { 
+    send: sinon.stub(),
+    status: sinon.stub().returns({ send: sinon.stub() })
+  }
+
+  return {req, res}
+}
+
+describe('test gmail-notifier functions', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox()
   })
@@ -26,6 +42,7 @@ describe('test gmail-notifier functions', () => {
       query: {},
       body: {}
     }
+
     const res = { redirect: sinon.stub() }
 
     // Call tested function
@@ -66,15 +83,7 @@ describe('test gmail-notifier functions', () => {
   })
 
   it('initWatch: should init watch on gmail inbox', async () => {
-    // mock dependencies
-    sandbox.stub(oauthLibrary, 'fetchToken')
-    sandbox.stub(gmailAPIClient, 'watchGmailInbox')
-
-    // Mock ExpressJS 'req' and 'res' parameters
-    const req = {
-      query: { emailAddress: 'some-email@address.com' }
-    }
-    const res = { send: sinon.stub() }
+    const {req, res} = setupInitWatch({emailAddress: 'some-email@address.com'})
 
     // Call tested function
     await initWatch(req, res)
@@ -84,6 +93,34 @@ describe('test gmail-notifier functions', () => {
     assert.match(res.send.firstCall.args[0], /Watch initialized/)
     assert.match(res.send.firstCall.args[0], /some-email@address.com/)
   })
+
+  it('initWatch: should return error 400 if no email address is specified', async () => {
+    const {req, res} = setupInitWatch({NoemailAddress: 'some-email@address.com'})
+
+
+    // Call tested function
+    await initWatch(req, res)
+
+    // Verify behavior of tested function
+    assert.ok(res.status.calledOnce)
+    assert.ok(res.status().send.calledOnce)
+    assert.equal(res.status.firstCall.args[0], 400)
+    assert.match(res.status().send.firstCall.args[0], /No emailAddress specified./)
+  })
+
+  it('initWatch: should return error 400 if a bad address is specified', async () => {
+    const {req, res} = setupInitWatch({emailAddress: 'some-emailaddress.com'})
+
+    // Call tested function
+    await initWatch(req, res)
+
+    // Verify behavior of tested function
+    assert.ok(res.status.calledOnce)
+    assert.ok(res.status().send.calledOnce)
+    assert.equal(res.status.firstCall.args[0], 400)
+    assert.match(res.status().send.firstCall.args[0], /Invalid emailAddress/)
+  })
+
 
   it('onNewMessage: should received message from Pub/sub and retreive email content', async () => {
     // given

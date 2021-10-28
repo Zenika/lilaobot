@@ -93,3 +93,6 @@ modules.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all
 /.idea/
+
+functions/gmail-notifier/coverage
+functions/gmail-notifier/.nyc_output
