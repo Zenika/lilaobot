@@ -80,8 +80,8 @@ exports.initWatch = async (req, res) => {
  * Process new messages as they are received
  * WIP, not implemented
  */
-exports.onNewMessage = async (message) => {
-  //could receive context as an additional parameter
+// eslint-disable-next-line no-unused-vars
+exports.onNewMessage = async (message, context) => {
   // Parse the Pub/Sub message
   const dataStr = Buffer.from(message.data, 'base64').toString()
   const dataObj = JSON.parse(dataStr)
