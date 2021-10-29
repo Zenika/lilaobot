@@ -7,11 +7,15 @@ describe('test gmail-api-client', () => {
   const gmailMessage = require('./gmail-message-response.json')
   const oauth2Client = {
     some: 'dummy client',
+
+    //eslint-disable-next-line no-unused-vars
     getToken: function (code, callback) {
       return { some: 'dummy token' }
     },
-    setCredentials: function (param) {}
+    //eslint-disable-next-line no-unused-vars
+    setCredentials: function (param) {},
   }
+  let sandbox;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -25,9 +29,9 @@ describe('test gmail-api-client', () => {
     return proxyquire('../lib/gmail-api-client', {
       googleapis: {
         google: {
-          gmail: () => mock
-        }
-      }
+          gmail: () => mock,
+        },
+      },
     })
   }
 
@@ -41,12 +45,12 @@ describe('test gmail-api-client', () => {
               data: {
                 messages: [gmailMessage],
                 nextPageToken: 'string',
-                resultSizeEstimate: 1
-              }
+                resultSizeEstimate: 1,
+              },
             }
-          }
-        }
-      }
+          },
+        },
+      },
     })
 
     // when
@@ -61,9 +65,9 @@ describe('test gmail-api-client', () => {
     const gmailAPIClient = getGmailAPIClient({
       users: {
         messages: {
-          get: () => gmailMessage
-        }
-      }
+          get: () => gmailMessage,
+        },
+      },
     })
 
     // when

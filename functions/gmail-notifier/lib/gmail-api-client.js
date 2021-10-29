@@ -23,10 +23,11 @@ const config = require('../config')
  * Helper function to get the current user's email address
  */
 exports.getEmailAddress = async (oauth2Client) => {
-  return gmail.users.getProfile({
-    auth: oauth2Client,
-    userId: 'me'
-  })
+  return gmail.users
+    .getProfile({
+      auth: oauth2Client,
+      userId: 'me',
+    })
     .then((res) => res.data.emailAddress)
 }
 
@@ -40,8 +41,8 @@ exports.watchGmailInbox = async (oauth2Client) => {
     userId: 'me',
     resource: {
       labelIds: ['INBOX'],
-      topicName: config.TOPIC_NAME
-    }
+      topicName: config.TOPIC_NAME,
+    },
   })
 }
 
@@ -51,9 +52,7 @@ exports.watchGmailInbox = async (oauth2Client) => {
  * @returns A promise containing a list of GMail message IDs
  */
 exports.listMessages = async (oauth2Client) => {
-  return gmail.users.messages.list(
-    { auth: oauth2Client, userId: 'me' }
-  )
+  return gmail.users.messages.list({ auth: oauth2Client, userId: 'me' })
 }
 
 /**
@@ -65,6 +64,6 @@ exports.getMessageById = (oauth2Client, messageId) => {
   return gmail.users.messages.get({
     auth: oauth2Client,
     id: messageId,
-    userId: 'me'
+    userId: 'me',
   })
 }

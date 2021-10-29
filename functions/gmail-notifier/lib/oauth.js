@@ -19,8 +19,15 @@ const getOAuth2Client = async () => {
 }
 exports.getOAuth2Client = getOAuth2Client
 
-async function accessSecretVersion (secretName) {
-  const request = { name: 'projects/' + config.GCLOUD_PROJECT + '/secrets/' + secretName + '/versions/latest' }
+async function accessSecretVersion(secretName) {
+  const request = {
+    name:
+      'projects/' +
+      config.GCLOUD_PROJECT +
+      '/secrets/' +
+      secretName +
+      '/versions/latest',
+  }
   let response
   try {
     response = await secretManagerServiceClient.accessSecretVersion(request)
@@ -37,7 +44,9 @@ async function accessSecretVersion (secretName) {
  */
 exports.fetchToken = async (emailAddress) => {
   const oauth2Client = await getOAuth2Client()
-  const tokens = await datastore.get(datastore.key(['oauth2Token', emailAddress]))
+  const tokens = await datastore.get(
+    datastore.key(['oauth2Token', emailAddress])
+  )
   console.debug(`fetched token from datastore: ${JSON.stringify(tokens)}`)
   const token = tokens[0]
 
@@ -67,6 +76,6 @@ exports.fetchToken = async (emailAddress) => {
 exports.saveToken = async (emailAddress, oauth2Client) => {
   return datastore.save({
     key: datastore.key(['oauth2Token', emailAddress]),
-    data: oauth2Client.credentials
+    data: oauth2Client.credentials,
   })
 }

@@ -27,6 +27,8 @@
     "sinon": "^11.1.2"
   },
   "devDependencies": {
+    "eslint": "^7.13.0",
+    "eslint-config-prettier": "^8.3.0",
     "mocha": "^8.4.0",
     "prettier": "2.4.1",
     "standard": "^16.0.3"

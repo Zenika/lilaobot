@@ -1,7 +1,6 @@
 const nconf = require('nconf')
 
-nconf.env()
-  .file({ file: 'config.json' })
+nconf.env().file({ file: 'config.json' })
 
 // Configuration constants
 const GCF_REGION = nconf.get('GCF_REGION')
@@ -15,5 +14,5 @@ exports.GCF_REGION = GCF_REGION
 exports.GCLOUD_PROJECT = GCLOUD_PROJECT
 
 // Constants
-exports.NO_LABEL_MATCH = 'Message doesn\'t match label'
+exports.NO_LABEL_MATCH = "Message doesn't match label"
 exports.UNKNOWN_USER_MESSAGE = 'Uninitialized email address'
