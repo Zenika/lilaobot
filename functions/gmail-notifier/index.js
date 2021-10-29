@@ -19,7 +19,7 @@ exports.oauth2init = async (req, res) => {
   const authUrl = lilaobotOAuthClient.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
-    prompt: 'consent' // Required in order to receive a refresh token every time
+    prompt: 'consent', // Required in order to receive a refresh token every time
   })
   return res.redirect(authUrl)
 }
@@ -80,23 +80,32 @@ exports.initWatch = async (req, res) => {
  * Process new messages as they are received
  * WIP, not implemented
  */
-exports.onNewMessage = async (message, context) => {
+exports.onNewMessage = async (message) => {
+  //could receive context as an additional parameter
   // Parse the Pub/Sub message
   const dataStr = Buffer.from(message.data, 'base64').toString()
   const dataObj = JSON.parse(dataStr)
   console.info(`incoming message: ${dataStr}`)
   const oauth2Client = await oauth.fetchToken(dataObj.emailAddress)
 
-  return gmailAPIClient.listMessages(oauth2Client)
-    .then((res) => gmailAPIClient.getMessageById(oauth2Client, res.data.messages[0].id)) // TODO: foreach
+  return gmailAPIClient
+    .listMessages(oauth2Client)
+    .then((res) =>
+      gmailAPIClient.getMessageById(oauth2Client, res.data.messages[0].id)
+    ) // TODO: foreach
     .then((messageResponse) => {
       console.log('message data > ' + JSON.stringify(messageResponse.data))
       console.log('snippet > ' + messageResponse.data.snippet)
 
-      messageResponse.data.payload.parts.forEach((part) =>{
+      messageResponse.data.payload.parts.forEach((part) => {
         console.log('part > ' + JSON.stringify(part))
-        console.log('part infos > ' + part.partId + " " + part.mimeType)
-        console.log('part body > ' + JSON.stringify(Buffer.from(part.body.data, 'base64').toString('utf8')))
+        console.log('part infos > ' + part.partId + ' ' + part.mimeType)
+        console.log(
+          'part body > ' +
+            JSON.stringify(
+              Buffer.from(part.body.data, 'base64').toString('utf8')
+            )
+        )
       })
       return messageResponse
     })

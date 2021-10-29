@@ -3,6 +3,7 @@
 This repository demonstrates how to write custom mail processing logic for Gmail using the [Gmail API][gmail] and [Cloud Functions][gcf]. See the [blog post][blog] for more information.
 
 ## Obtaining an OAuth 2.0 Client ID
+
 In order for an OAuth 2.0 API to verify our program's identity, we must include
 an _OAuth 2.0 client ID_ with some of our requests to the API. The following
 steps show how to enable the Gmail API and download the client ID to your local
@@ -22,12 +23,13 @@ machine.
 
 1.  Click _Create_, then close the resulting dialog box and click the
     **Download** icon next to your newly created client ID. The resulting file
-    is your __Client Secret file__.
+    is your **Client Secret file**.
 
 ## Configuring local files
-1.    Rename your __Client Secret file__ to `client_secret.json`, and move it to
+
+1.  Rename your **Client Secret file** to `client_secret.json`, and move it to
     the directory that contains your `index.js` and `package.json` files.
-1.    In `config.json`, update the values for `GCF_REGION`, `GCLOUD_PROJECT`,
+1.  In `config.json`, update the values for `GCF_REGION`, `GCLOUD_PROJECT`,
     and `TOPIC_ID`.
 
 [blog]: https://cloud.google.com/blog/products/application-development/adding-custom-intelligence-to-gmail-with-serverless-on-gcp
