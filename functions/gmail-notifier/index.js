@@ -76,6 +76,18 @@ exports.initWatch = async (req, res) => {
   return res.send(`Watch initialized on gmail inbox: ${email}`)
 }
 
+exports.postMessageToSlack = async (text) => {
+  const token = 'slack-bot-token'
+  const web = new WebClient(token)
+  const conversationID = 'C021BGBSMFY'
+  try {
+    const res = await web.chat.postMessage({ channel: conversationID, text })
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+
 /**
  * Process new messages as they are received
  * WIP, not implemented
