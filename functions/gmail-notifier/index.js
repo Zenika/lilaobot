@@ -85,34 +85,33 @@ exports.onNewMessage = async (message, context) => {
   // Parse the Pub/Sub message
   const dataStr = Buffer.from(message.data, 'base64').toString()
   const dataObj = JSON.parse(dataStr)
+  const emailAddress = dataObj.emailAddress
   console.info(`incoming message: ${dataStr}`)
-  const oauth2Client = await oauth.fetchToken(dataObj.emailAddress)
 
-  return gmailAPIClient
-    .listMessages(oauth2Client)
-    .then((res) =>
-      gmailAPIClient.getMessageById(oauth2Client, res.data.messages[0].id)
+  try {
+    const oauth2Client = await oauth.fetchToken(dataObj.emailAddress)
+    const res = await gmailAPIClient.listMessages(oauth2Client)
+    const messageResponse = await gmailAPIClient.getMessageById(
+      oauth2Client,
+      res.data.messages[0].id
     ) // TODO: foreach
-    .then((messageResponse) => {
-      console.log('message data > ' + JSON.stringify(messageResponse.data))
-      console.log('snippet > ' + messageResponse.data.snippet)
+    const mailSubject = messageResponse.data.payload.headers.filter(
+      (e) => e.name == 'Subject'
+    )[0].value
+    const textPart = messageResponse.data.payload.parts.filter(
+      (e) => e.mimeType == 'text/plain'
+    )[0]
+    const bodyPlain = Buffer.from(textPart.body.data, 'base64').toString('utf8')
 
-      messageResponse.data.payload.parts.forEach((part) => {
-        console.log('part > ' + JSON.stringify(part))
-        console.log('part infos > ' + part.partId + ' ' + part.mimeType)
-        console.log(
-          'part body > ' +
-            JSON.stringify(
-              Buffer.from(part.body.data, 'base64').toString('utf8')
-            )
-        )
-      })
-      return messageResponse
-    })
-    .catch((err) => {
-      // Handle unexpected errors
-      if (!err.message || err.message !== config.NO_LABEL_MATCH) {
-        console.error(err)
-      }
-    })
+    await this.postMessageToSlack(
+      `Mail de ${emailAddress}:\nObjet: ${mailSubject}\n${bodyPlain}`
+    )
+
+    return messageResponse
+  } catch (err) {
+    // Handle unexpected errors
+    if (!err.message || err.message !== config.NO_LABEL_MATCH) {
+      console.error(err)
+    }
+  }
 }

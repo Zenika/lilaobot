@@ -13,6 +13,10 @@
       {
         "name": "string",
         "value": "string"
+      },
+      {
+        "name": "Subject",
+        "value": "string"
       }
     ],
     "body": {
@@ -20,7 +24,23 @@
       "size": 1,
       "data": "some data"
     },
-    "parts": []
+    "parts": [
+      {
+        "partId": "0",
+        "mimeType": "text/plain",
+        "filename": "",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "text/plain; charset=\"UTF-8\""
+          }
+        ],
+        "body": {
+          "size": 68,
+          "data": "Q09SUFMgRFUgTUFJTA0KDQpDT1VDT1VDKmVkZGRkZGQgZGRkZGRkIGN4cWRzZGRmZmYqDQoqRklOIERVIE1BSUwqDQo="
+        }
+      }
+    ]
   },
   "sizeEstimate": 1,
   "raw": "string"
