@@ -4,6 +4,7 @@ const querystring = require('querystring')
 const config = require('./config')
 const oauth = require('./lib/oauth')
 const gmailAPIClient = require('./lib/gmail-api-client')
+const slackClient = require('./lib/slack-client')
 
 /**
  * Request an OAuth 2.0 authorization code
@@ -76,18 +77,6 @@ exports.initWatch = async (req, res) => {
   return res.send(`Watch initialized on gmail inbox: ${email}`)
 }
 
-exports.postMessageToSlack = async (text) => {
-  const token = 'slack-bot-token'
-  const web = new WebClient(token)
-  const conversationID = 'C021BGBSMFY'
-  try {
-    const res = await web.chat.postMessage({ channel: conversationID, text })
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-
 /**
  * Process new messages as they are received
  * WIP, not implemented
@@ -115,7 +104,7 @@ exports.onNewMessage = async (message, context) => {
     )[0]
     const bodyPlain = Buffer.from(textPart.body.data, 'base64').toString('utf8')
 
-    await this.postMessageToSlack(
+    await slackClient.postMessageToSlack(
       `Mail de ${emailAddress}:\nObjet: ${mailSubject}\n${bodyPlain}`
     )
 
