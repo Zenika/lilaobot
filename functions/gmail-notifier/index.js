@@ -69,16 +69,15 @@ exports.initWatch = async (req, res) => {
   console.info(`starting initWatch for email: ${email}`)
 
   // Retrieve the stored OAuth 2.0 access token
-  const oatuhClient = await oauth.fetchToken(email)
-
-  await gmailAPIClient.watchGmailInbox(oatuhClient)
+  const oauthClient = await oauth.fetchToken(email)
+  await gmailAPIClient.watchGmailInbox(oauthClient)
 
   // Respond with status
   return res.send(`Watch initialized on gmail inbox: ${email}`)
 }
 
 /**
- * Process new messages as they are received
+ * Process new PubSub messages as they are received
  * WIP, not implemented
  */
 // eslint-disable-next-line no-unused-vars
@@ -90,18 +89,21 @@ exports.onNewMessage = async (message, context) => {
   console.info(`incoming message: ${dataStr}`)
 
   try {
-    const oauth2Client = await oauth.fetchToken(dataObj.emailAddress)
+    const oauth2Client = await oauth.fetchToken(emailAddress)
     const res = await gmailAPIClient.listMessages(oauth2Client)
     const messageResponse = await gmailAPIClient.getMessageById(
       oauth2Client,
       res.data.messages[0].id
     ) // TODO: foreach
+
     const mailSubject = messageResponse.data.payload.headers.filter(
       (e) => e.name == 'Subject'
     )[0].value
+
     const textPart = messageResponse.data.payload.parts.filter(
       (e) => e.mimeType == 'text/plain'
     )[0]
+
     const bodyPlain = Buffer.from(textPart.body.data, 'base64').toString('utf8')
 
     await slackClient.postMessageToSlack(

@@ -21,16 +21,30 @@ Terraform state is saved in a Google Cloud Storage named `lilaobot-terraform-sta
 
 ### Requirements
 - a GCS bucket to store Terraform's state
-- a GCP Service Account, with `Cloud Function Developer`, `Service Account User`, `Storage Object Admin` and `Storage Admin` roles
+- a GCP Service Account, with following roles:
+    - `Cloud Function Developer`
+    - `Service Account User`
+    - `Storage Object Admin`
+    - `Storage Admin`
 - Secrets on Github repository:
     - GCP_SA_KEY (service account credentials, a JSON file)
     - GCP_PROJECT (project id)
+- Create an OAuth Client ID Credentials through GCP Console -> APIS & Services -> Credentials
+- Secrets on GCP through GCP Console -> Security -> Secret Manager:
+    - oauth2-client-id: Client ID from previously created OAuth Credentials
+    - oauth2-client-secret: Client ID from previously created OAuth Credentials
+    - slack-bot-token: The token of the Slackbot Application (https://api.slack.com/authentication/basics)
 
 ## Resources
 This project is based on [this article from Google](https://cloud.google.com/blog/products/application-development/adding-custom-intelligence-to-gmail-with-serverless-on-gcp), without the image part.
 
 Below, the goal of this actual project:
 ![Lilaobot architechure diagram](./doc/lilaobot-architecture-diagram.png "Lilaobot architecture diagram")
+
+## How to Use
+
+After deployment you can activate the bot through this URLs : https://europe-west1-lilaobot.cloudfunctions.net/oauth2init
+This URLs is retrievable in the GCP Console -> Cloud Functions -> Trigger -> HTTP.
 
 
 ## Author
