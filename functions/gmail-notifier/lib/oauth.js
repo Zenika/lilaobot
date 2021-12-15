@@ -32,7 +32,7 @@ async function accessSecretVersion(secretName) {
   try {
     response = await secretManagerServiceClient.accessSecretVersion(request)
   } catch (e) {
-    console.error('could not access project oauthid version, error: ' + e)
+    console.error('could not access project secret, error: ' + e)
     throw e
   }
   return response[0].payload.data.toString('utf8')

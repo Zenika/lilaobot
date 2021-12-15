@@ -3,6 +3,7 @@ const sinon = require('sinon')
 const { oauth2init, oauth2callback, initWatch, onNewMessage } = require('..')
 const oauthLibrary = require('../lib/oauth')
 const gmailAPIClient = require('../lib/gmail-api-client')
+const slackClient = require('../lib/slack-client')
 let sandbox;
 
 function setupInitWatch(query) {
@@ -141,6 +142,7 @@ describe('test gmail-notifier functions', () => {
     sandbox
       .stub(gmailAPIClient, 'getMessageById')
       .returns({ data: gmailMessage })
+    const slackClientSpy = sandbox.stub(slackClient, 'postMessageToSlack').returns(Promise.resolve())
 
     const message = {
       // from https://developers.google.com/gmail/api/guides/push#watch_response
@@ -157,5 +159,6 @@ describe('test gmail-notifier functions', () => {
 
     // then
     assert.match(result.data.payload.body.data, /some data/)
+    sandbox.assert.called(slackClientSpy);
   })
 })

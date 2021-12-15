@@ -1,0 +1,2 @@
+https://github.com/levz0r/gmail-tester/blob/master/gmail-tester.js
+https://stackoverflow.com/questions/42090593/gmail-watch-user-inbox-history-getmessagesadded-is-not-returning-the-new-messag
