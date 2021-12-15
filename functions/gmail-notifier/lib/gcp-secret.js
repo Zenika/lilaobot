@@ -1,5 +1,6 @@
 'use strict'
 
+const config = require('../config')
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
 const secretManagerServiceClient = new SecretManagerServiceClient()
 
