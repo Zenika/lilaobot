@@ -12,7 +12,7 @@ exports.get = async (secretName) => {
     let response
     try {
       response = await secretManagerServiceClient.accessSecretVersion(request)
-      cache.put(secretName, response[0].payload.data.toString('utf8'))
+      cache.set(secretName, response[0].payload.data.toString('utf8'))
     } catch (e) {
       console.error('Could not access project secret, error: ' + e)
       throw e

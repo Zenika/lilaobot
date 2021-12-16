@@ -5,6 +5,7 @@ resource "google_pubsub_topic" "default" {
 resource "google_storage_bucket" "functions_bucket" {
   name          = "lilaobot-functions-storage"
   force_destroy = true
+  location      = var.gcp_region
 }
 
 data "archive_file" "slack_publisher_archive" {
@@ -34,9 +35,9 @@ resource "google_storage_bucket_object" "gmail_notifier_archive_bucket_object" {
 
 locals {
   environment_variables = {
-    FUNCTION_REGION = "${var.gcp_region}"
-    GCP_PROJECT     = "${var.gcp_project}"
-    TOPIC_ID        = "${var.function_topic}"
+    FUNCTION_REGION = var.gcp_region
+    GCP_PROJECT     = var.gcp_project
+    TOPIC_ID        = var.function_topic
   }
 }
 
