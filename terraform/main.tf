@@ -8,23 +8,10 @@ resource "google_storage_bucket" "functions_bucket" {
   location      = var.gcp_region
 }
 
-data "archive_file" "slack_publisher_archive" {
-  type        = "zip"
-  source_dir  = "../functions/slack-publisher"
-  output_path = "slack_publisher.zip"
-}
-
 data "archive_file" "gmail_notifier_archive" {
   type        = "zip"
   source_dir  = "../functions/gmail-notifier"
   output_path = "gmail_notifier.zip"
-}
-
-# https://github.com/hashicorp/terraform-provider-google/issues/1938 dynamic name, otherwise the Function cannot be updated
-resource "google_storage_bucket_object" "slack_publisher_archive_bucket_object" {
-  name   = format("%s#%s", "slack_publisher.zip", data.archive_file.slack_publisher_archive.output_md5)
-  bucket = google_storage_bucket.functions_bucket.name
-  source = data.archive_file.slack_publisher_archive.output_path
 }
 
 resource "google_storage_bucket_object" "gmail_notifier_archive_bucket_object" {
@@ -39,23 +26,6 @@ locals {
     GCP_PROJECT     = var.gcp_project
     TOPIC_ID        = var.function_topic
   }
-}
-
-resource "google_cloudfunctions_function" "slack_publisher_function" {
-  name        = "slack-publisher"
-  description = "Receives messages from Pub/sub and send them to Slack"
-  runtime     = "python39"
-
-  available_memory_mb   = 128
-  source_archive_bucket = google_storage_bucket.functions_bucket.name
-  source_archive_object = google_storage_bucket_object.slack_publisher_archive_bucket_object.name
-  timeout               = 60
-  entry_point           = "publishToSlack"
-  event_trigger {
-    event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
-    resource   = "projects/${var.gcp_project}/topics/${var.function_topic}"
-  }
-  environment_variables = local.environment_variables
 }
 
 resource "google_cloudfunctions_function" "gmail_notifier_oauth2init_function" {
@@ -118,17 +88,7 @@ resource "google_cloudfunctions_function" "gmail_notifier_onNewMessage_function"
 }
 
 # IAM entry for all users to invoke the function
-resource "google_cloudfunctions_function_iam_member" "invoker" {
-  project        = google_cloudfunctions_function.slack_publisher_function.project
-  region         = google_cloudfunctions_function.slack_publisher_function.region
-  cloud_function = google_cloudfunctions_function.slack_publisher_function.name
-
-  role = "roles/cloudfunctions.invoker"
-  #  member = "user:myFunctionInvoker@example.com" TODO maybe be more precise ?
-  member = "allUsers"
-}
-
-resource "google_cloudfunctions_function_iam_member" "invoker2" {
+resource "google_cloudfunctions_function_iam_member" "oauth2init_allusers_permission" {
   project        = google_cloudfunctions_function.gmail_notifier_oauth2init_function.project
   region         = google_cloudfunctions_function.gmail_notifier_oauth2init_function.region
   cloud_function = google_cloudfunctions_function.gmail_notifier_oauth2init_function.name
@@ -136,7 +96,7 @@ resource "google_cloudfunctions_function_iam_member" "invoker2" {
   member         = "allUsers"
 }
 
-resource "google_cloudfunctions_function_iam_member" "callback_allusers_permission" {
+resource "google_cloudfunctions_function_iam_member" "oauth2callback_allusers_permission" {
   project        = google_cloudfunctions_function.gmail_notifier_oauth2callback_function.project
   region         = google_cloudfunctions_function.gmail_notifier_oauth2callback_function.region
   cloud_function = google_cloudfunctions_function.gmail_notifier_oauth2callback_function.name
