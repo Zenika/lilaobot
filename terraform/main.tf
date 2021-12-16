@@ -32,6 +32,14 @@ resource "google_storage_bucket_object" "gmail_notifier_archive_bucket_object" {
   source = data.archive_file.gmail_notifier_archive.output_path
 }
 
+locals {
+  environment_variables = {
+    FUNCTION_REGION = "${var.gcp_region}"
+    GCP_PROJECT     = "${var.gcp_project}"
+    TOPIC_ID        = "${var.function_topic}"
+  }
+}
+
 resource "google_cloudfunctions_function" "slack_publisher_function" {
   name        = "slack-publisher"
   description = "Receives messages from Pub/sub and send them to Slack"
@@ -46,6 +54,7 @@ resource "google_cloudfunctions_function" "slack_publisher_function" {
     event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
     resource   = "projects/${var.gcp_project}/topics/${var.function_topic}"
   }
+  environment_variables = local.environment_variables
 }
 
 resource "google_cloudfunctions_function" "gmail_notifier_oauth2init_function" {
@@ -59,6 +68,7 @@ resource "google_cloudfunctions_function" "gmail_notifier_oauth2init_function" {
   timeout               = 60
   entry_point           = "oauth2init"
   trigger_http          = true
+  environment_variables = local.environment_variables
 }
 
 resource "google_cloudfunctions_function" "gmail_notifier_oauth2callback_function" {
@@ -72,6 +82,7 @@ resource "google_cloudfunctions_function" "gmail_notifier_oauth2callback_functio
   timeout               = 60
   entry_point           = "oauth2callback"
   trigger_http          = true
+  environment_variables = local.environment_variables
 }
 
 resource "google_cloudfunctions_function" "gmail_notifier_initWatch_function" {
@@ -85,6 +96,7 @@ resource "google_cloudfunctions_function" "gmail_notifier_initWatch_function" {
   timeout               = 60
   entry_point           = "initWatch"
   trigger_http          = true
+  environment_variables = local.environment_variables
 }
 
 resource "google_cloudfunctions_function" "gmail_notifier_onNewMessage_function" {
@@ -101,6 +113,7 @@ resource "google_cloudfunctions_function" "gmail_notifier_onNewMessage_function"
     event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
     resource   = "projects/${var.gcp_project}/topics/${var.function_topic}"
   }
+  environment_variables = local.environment_variables
 }
 
 # IAM entry for all users to invoke the function
