@@ -1,11 +1,7 @@
-const nconf = require('nconf')
-
-nconf.env().file({ file: 'config.json' })
-
-// Configuration constants
-const GCF_REGION = nconf.get('GCF_REGION')
-const GCLOUD_PROJECT = nconf.get('GCLOUD_PROJECT')
-const TOPIC_ID = nconf.get('TOPIC_ID')
+// Retrieves all the Environment Variables (See main.tf to know their values)
+const GCF_REGION = process.env.FUNCTION_REGION
+const GCLOUD_PROJECT = process.env.GCP_PROJECT
+const TOPIC_ID = process.env.TOPIC_ID
 
 // Computed values
 exports.GCF_BASE_URL = `https://${GCF_REGION}-${GCLOUD_PROJECT}.cloudfunctions.net`

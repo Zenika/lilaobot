@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "license": "Apache-2.0",
-  "author": "Google LLC",
+  "author": "Zenika",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GoogleCloudPlatform/cloud-functions-gmail-nodejs.git"
+    "url": "https://github.com/Zenika/lilaobot.git"
   },
   "engines": {
     "node": ">=14.0"

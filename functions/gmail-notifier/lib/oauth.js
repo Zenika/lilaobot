@@ -3,14 +3,13 @@
 const config = require('../config')
 const { Datastore } = require('@google-cloud/datastore')
 const datastore = new Datastore()
-const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
-const secretManagerServiceClient = new SecretManagerServiceClient()
 const { google } = require('googleapis')
+const gcpSecrets = require('./gcp-secrets')
 
 // Retrieve current GCP project OAuth2 id
 const getOAuth2Client = async () => {
-  const oauth2ClientId = await accessSecretVersion('oauth2-client-id')
-  const oauth2ClientSecret = await accessSecretVersion('oauth2-client-secret')
+  const oauth2ClientId = await gcpSecrets.get('oauth2-client-id')
+  const oauth2ClientSecret = await gcpSecrets.get('oauth2-client-secret')
   return new google.auth.OAuth2(
     oauth2ClientId,
     oauth2ClientSecret,
@@ -18,25 +17,6 @@ const getOAuth2Client = async () => {
   )
 }
 exports.getOAuth2Client = getOAuth2Client
-
-async function accessSecretVersion(secretName) {
-  const request = {
-    name:
-      'projects/' +
-      config.GCLOUD_PROJECT +
-      '/secrets/' +
-      secretName +
-      '/versions/latest',
-  }
-  let response
-  try {
-    response = await secretManagerServiceClient.accessSecretVersion(request)
-  } catch (e) {
-    console.error('could not access project secret, error: ' + e)
-    throw e
-  }
-  return response[0].payload.data.toString('utf8')
-}
 
 /**
  * Helper function to fetch a user's OAuth 2.0 access token
