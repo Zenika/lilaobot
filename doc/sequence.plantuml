@@ -1,0 +1,37 @@
+@startuml
+skinparam ResponseMessageBelowArrow true
+actor user
+control function
+boundary gmailApi
+database datastore
+queue PubSub
+boundary SlackClient
+alt Initialization
+user -> function: .../oauth2init
+note over user,function
+Classical OAuth2 dance where user authorizes function to read his mail
+end note
+user <- function: REDIRECT .../oauth2callback
+user -> function: .../oauth2callback
+activate function
+function -> datastore: Stores user credentials
+user <- function: REDIRECT .../initWatch
+deactivate function
+user -> function: .../initWatch
+activate function
+function -> datastore: Read user credentials
+function -> gmailApi: Starts watching user mails
+deactivate function
+end
+
+alt Incoming mail
+gmailApi -> PubSub: mail received
+activate PubSub
+PubSub -> function: onNewMessage
+deactivate PubSub
+activate function
+function -> gmailApi: Read message details
+function -> SlackClient: Send message
+deactivate function
+end
+@enduml
