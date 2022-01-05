@@ -70,6 +70,7 @@ exports.initWatch = async (req, res) => {
 
   // Retrieve the stored OAuth 2.0 access token
   const oauthClient = await oauth.fetchToken(email)
+  // Initialize PubSub connection for given email account (which means the onNewMessage function will be called for each new mail of user)
   await gmailAPIClient.watchGmailInbox(oauthClient)
 
   // Respond with status

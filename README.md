@@ -13,9 +13,9 @@
 Work in progress :construction:
 
 ## Setup
-### How
-On each commit, Github Actions applies Terraform conf (located at `./terraform`),
-to deploy the GCP Function (located at `./functions`)
+### Deployment
+On each commit, Github Action (`.github/workflows/main.yml`) applies Terraform conf (located at `./terraform`),
+to deploy the GCP Functions (located at `./functions`)
 
 Terraform state is saved in a Google Cloud Storage named `lilaobot-terraform-state`
 
@@ -44,8 +44,18 @@ Below, the goal of this actual project:
 ## How to Use
 
 After deployment you can activate the bot through this URLs : https://europe-west1-lilaobot.cloudfunctions.net/oauth2init
-This URLs is retrievable in the GCP Console -> Cloud Functions -> Trigger -> HTTP.
 
+**BEWARE** This will send all your new mails into Zenika Slack channel named [`project-lilaobot`](https://zenika.slack.com/archives/C021BGBSMFY)
+
+**NOTE** This URLs is retrievable in the GCP Console -> Cloud Functions -> Trigger -> HTTP.
+
+Once this url is invoked (and authorization is granted) the function is authorized to read user mails.
+
+## How does it works ?
+
+![Lilaobot sequence diagram](./doc/sequence.png "Lilaobot sequence diagram")
+
+Two main flows are visible here: initialization and transfer of message
 
 ## Author
 
