@@ -45,6 +45,13 @@ exports.watchGmailInbox = async (oauth2Client) => {
     },
   })
 }
+exports.unwatchGmailInbox = async (oauth2Client) => {
+  return gmail.users.stop({
+    auth: oauth2Client,
+    userId: 'me'
+  })
+}
+
 
 /**
  * List GMail message IDs

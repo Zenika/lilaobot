@@ -77,6 +77,31 @@ exports.initWatch = async (req, res) => {
 }
 
 /**
+ * Ends a watch on the user's inbox
+ */
+exports.endWatch = async (req, res) => {
+  // Require a valid email address
+  if (!req.query.emailAddress) {
+    return res.status(400).send('No emailAddress specified.')
+  }
+  const email = querystring.unescape(req.query.emailAddress)
+  if (!email.includes('@')) {
+    return res.status(400).send(`Invalid emailAddress, it was: ${email}`)
+  }
+
+  console.info(`starting endWatch for email: ${email}`)
+
+  // Retrieve the stored OAuth 2.0 access token
+  const oauthClient = await oauth.fetchToken(email)
+  // Stop PubSub connection for given email account
+  await gmailAPIClient.unwatchGmailInbox(oauthClient)
+  await oauth.deleteToken(email)
+
+  // Respond with status
+  return res.send(`Watch ended on gmail inbox: ${email}`)
+
+}
+/**
  * Process new PubSub messages as they are received
  * WIP, not implemented
  */

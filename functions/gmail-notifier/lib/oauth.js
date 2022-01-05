@@ -59,3 +59,12 @@ exports.saveToken = async (emailAddress, oauth2Client) => {
     data: oauth2Client.credentials,
   })
 }
+
+/**
+ * Helper function to delete an OAuth 2.0 access token from Datastore
+ */
+exports.deleteToken = async (emailAddress, oauth2Client) => {
+  return datastore.delete({
+    key: datastore.key(['oauth2Token', emailAddress])
+  })
+}
