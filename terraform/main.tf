@@ -70,6 +70,20 @@ resource "google_cloudfunctions_function" "gmail_notifier_initWatch_function" {
   environment_variables = local.environment_variables
 }
 
+resource "google_cloudfunctions_function" "gmail_notifier_endWatch_function" {
+  name        = "endWatch"
+  description = "end watch on given gmail inbox"
+  runtime     = "nodejs14"
+
+  available_memory_mb   = 256
+  source_archive_bucket = google_storage_bucket.functions_bucket.name
+  source_archive_object = google_storage_bucket_object.gmail_notifier_archive_bucket_object.name
+  timeout               = 60
+  entry_point           = "endWatch"
+  trigger_http          = true
+  environment_variables = local.environment_variables
+}
+
 resource "google_cloudfunctions_function" "gmail_notifier_onNewMessage_function" {
   name        = "onNewMessage"
   description = "onNewMessage on given gmail inbox"
