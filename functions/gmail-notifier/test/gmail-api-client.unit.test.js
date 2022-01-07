@@ -39,7 +39,7 @@ describe('test gmail-api-client', () => {
     // given
     const gmailAPIClient = getGmailAPIClient({
       users: {
-        messages: {
+        history: {
           list: function () {
             return {
               data: {
