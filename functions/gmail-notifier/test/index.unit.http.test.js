@@ -158,7 +158,7 @@ describe('test gmail-notifier functions', () => {
     const result = await onNewMessage(message)
 
     // then
-    assert.match(result.data.payload.body.data, /some data/)
+    assert.match(result.length, /some data/)
     sandbox.assert.called(slackClientSpy);
   })
 })
