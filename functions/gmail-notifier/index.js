@@ -154,5 +154,5 @@ async function processMessage(emailAddress, messageResponse) {
 
   console.info(`Sending slack message for ${messageResponse.data.id} (subject is ${mailSubject})`)
   await slackClient.postMessageToSlack(slackMessage)
-  console.info(`Sent! slack message for ${messageResponse.data.id} (subject is ${mailSubject})`)
+  console.info(`Sent! slack message for ${messageResponse.data.id} (subject is ${mailSubject}).\nFull message is ${slackMessage}`)
 }
