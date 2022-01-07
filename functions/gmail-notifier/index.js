@@ -119,9 +119,10 @@ exports.onNewMessage = async (message, context) => {
     const messages = await gmailAPIClient.listMessages(oauth2Client, dataObj.historyId)
     console.info(`There are ${messages.length} messages in recent history`)
     for(var message in messages) {
+      console.info(`Extracting real GMail message from ${message}`)
       const messageResponse = await gmailAPIClient.getMessageById(
         oauth2Client,
-        res.data.messages[0].id
+        message.id
       )
   
       processMessage(messageResponse)
