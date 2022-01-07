@@ -64,8 +64,8 @@ exports.listMessages = async (oauth2Client, history) => {
   var pageToken = ''
   do {
     listFragment = gmail.users.history.list({ auth: oauth2Client, userId: 'me', pageToken: pageToken })
-    pageToken = listFragment.pageToken
-    messages.push(listFragment.messages)
+    pageToken = listFragment.data.pageToken
+    messages = messages.concat(listFragment.data.messages)
   } while(pageToken!==undefined);
   return messages
 }

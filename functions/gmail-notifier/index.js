@@ -126,7 +126,7 @@ exports.onNewMessage = async (message, context) => {
         message.id
       )
   
-      processMessage(messageResponse)
+      processMessage(emailAddress, messageResponse)
       returned.push({message:message, messageResponse:messageResponse, status:'OK'})
     }
     return returned
@@ -138,21 +138,21 @@ exports.onNewMessage = async (message, context) => {
   }
 }
 
-async function processMessage(messageResponse) {
-  console.info(`Processing message ${messageResponse}`)
-  const mailSubject = messageResponse.data.payload.headers.filter(
-    (e) => e.name == 'Subject'
-  )[0].value
-
-  const textPart = messageResponse.data.payload.parts.filter(
-    (e) => e.mimeType == 'text/plain'
-  )[0]
-
+async function processMessage(emailAddress, messageResponse) {
+  console.info(`Processing message\n${JSON.stringify(messageResponse)}`)
+  const mailSubjectResult = messageResponse.data.payload.headers.filter((e) => e.name == 'Subject')
+  
+  const mailSubject = mailSubjectResult.length>0 ? mailSubjectResult[0].value : "NO SUBJECT FOUND"
+  
+  const textPartResult = messageResponse.data.payload.parts.filter((e) => e.mimeType == 'text/plain')
+  
+  const textPart = textPartResult[0]
+  
   const bodyPlain = Buffer.from(textPart.body.data, 'base64').toString('utf8')
-
+  
   const slackMessage = `Mail de ${emailAddress}:\nObjet: ${mailSubject}\n${bodyPlain}`
 
+  console.info(`Sending slack message for ${messageResponse.data.id} (subject is ${mailSubject})`)
   await slackClient.postMessageToSlack(slackMessage)
-
-  console.info(`Sent slack message ${slackMessage}`)
+  console.info(`Sent! slack message for ${messageResponse.data.id} (subject is ${mailSubject})`)
 }

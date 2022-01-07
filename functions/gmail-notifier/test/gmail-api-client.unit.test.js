@@ -44,7 +44,7 @@ describe('test gmail-api-client', () => {
             return {
               data: {
                 messages: [gmailMessage],
-                nextPageToken: 'string',
+                nextPageToken: undefined,
                 resultSizeEstimate: 1,
               },
             }
