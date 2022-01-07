@@ -39,12 +39,12 @@ describe('test gmail-api-client', () => {
     // given
     const gmailAPIClient = getGmailAPIClient({
       users: {
-        messages: {
+        history: {
           list: function () {
             return {
               data: {
                 messages: [gmailMessage],
-                nextPageToken: 'string',
+                nextPageToken: undefined,
                 resultSizeEstimate: 1,
               },
             }
@@ -57,7 +57,7 @@ describe('test gmail-api-client', () => {
     const result = await gmailAPIClient.listMessages(oauth2Client)
 
     // then
-    assert.equal(result.data.messages[0].id, ['1234'])
+    assert.equal(result[0].id, ['1234'])
   })
 
   it('getMessageById: should get a message by id', async () => {
