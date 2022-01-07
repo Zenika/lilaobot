@@ -118,6 +118,7 @@ exports.onNewMessage = async (message, context) => {
     const oauth2Client = await oauth.fetchToken(emailAddress)
     const messages = await gmailAPIClient.listMessages(oauth2Client, dataObj.historyId)
     console.info(`There are ${messages.length} messages in recent history`)
+    const returned = []
     for(var message in messages) {
       console.info(`Extracting real GMail message from ${message}`)
       const messageResponse = await gmailAPIClient.getMessageById(
@@ -126,8 +127,9 @@ exports.onNewMessage = async (message, context) => {
       )
   
       processMessage(messageResponse)
+      returned.push({message:message, messageResponse:messageResponse, status:'OK'})
     }
-    return messageResponse
+    return returned
   } catch (err) {
     // Handle unexpected errors
     if (!err.message || err.message !== config.NO_LABEL_MATCH) {
