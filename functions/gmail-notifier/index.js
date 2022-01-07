@@ -112,30 +112,20 @@ exports.onNewMessage = async (message, context) => {
   const dataStr = Buffer.from(message.data, 'base64').toString()
   const dataObj = JSON.parse(dataStr)
   const emailAddress = dataObj.emailAddress
-  console.info(`incoming message: ${dataStr}`)
+  console.info(`Processing messages for account ${emailAddress} starting at history ${dataObj.historyId}`)
 
   try {
     const oauth2Client = await oauth.fetchToken(emailAddress)
-    const res = await gmailAPIClient.listMessages(oauth2Client)
-    const messageResponse = await gmailAPIClient.getMessageById(
-      oauth2Client,
-      res.data.messages[0].id
-    ) // TODO: foreach
-
-    const mailSubject = messageResponse.data.payload.headers.filter(
-      (e) => e.name == 'Subject'
-    )[0].value
-
-    const textPart = messageResponse.data.payload.parts.filter(
-      (e) => e.mimeType == 'text/plain'
-    )[0]
-
-    const bodyPlain = Buffer.from(textPart.body.data, 'base64').toString('utf8')
-
-    await slackClient.postMessageToSlack(
-      `Mail de ${emailAddress}:\nObjet: ${mailSubject}\n${bodyPlain}`
-    )
-
+    const messages = await gmailAPIClient.listMessages(oauth2Client, dataObj.historyId)
+    console.info(`There are ${messages.length} messages in recent history`)
+    for(var message in messages) {
+      const messageResponse = await gmailAPIClient.getMessageById(
+        oauth2Client,
+        res.data.messages[0].id
+      )
+  
+      processMessage(messageResponse)
+    }
     return messageResponse
   } catch (err) {
     // Handle unexpected errors
@@ -143,4 +133,23 @@ exports.onNewMessage = async (message, context) => {
       console.error(err)
     }
   }
+}
+
+async function processMessage(messageResponse) {
+  console.info(`Processing message ${messageResponse}`)
+  const mailSubject = messageResponse.data.payload.headers.filter(
+    (e) => e.name == 'Subject'
+  )[0].value
+
+  const textPart = messageResponse.data.payload.parts.filter(
+    (e) => e.mimeType == 'text/plain'
+  )[0]
+
+  const bodyPlain = Buffer.from(textPart.body.data, 'base64').toString('utf8')
+
+  const slackMessage = `Mail de ${emailAddress}:\nObjet: ${mailSubject}\n${bodyPlain}`
+
+  await slackClient.postMessageToSlack(slackMessage)
+
+  console.info(`Sent slack message ${slackMessage}`)
 }
