@@ -57,7 +57,7 @@ describe('test gmail-api-client', () => {
     const result = await gmailAPIClient.listMessages(oauth2Client)
 
     // then
-    assert.equal(result.data.messages[0].id, ['1234'])
+    assert.equal(result[0].id, ['1234'])
   })
 
   it('getMessageById: should get a message by id', async () => {
