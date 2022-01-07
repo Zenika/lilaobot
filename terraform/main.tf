@@ -126,6 +126,14 @@ resource "google_cloudfunctions_function_iam_member" "initWatch_allusers_permiss
   member         = "allUsers"
 }
 
+resource "google_cloudfunctions_function_iam_member" "endWatch_allusers_permission" {
+  project        = google_cloudfunctions_function.gmail_notifier_endWatch_function.project
+  region         = google_cloudfunctions_function.gmail_notifier_endWatch_function.region
+  cloud_function = google_cloudfunctions_function.gmail_notifier_endWatch_function.name
+  role           = "roles/cloudfunctions.invoker"
+  member         = "allUsers"
+}
+
 resource "google_cloudfunctions_function_iam_member" "onNewMessage_allusers_permission" {
   project        = google_cloudfunctions_function.gmail_notifier_onNewMessage_function.project
   region         = google_cloudfunctions_function.gmail_notifier_onNewMessage_function.region
