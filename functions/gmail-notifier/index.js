@@ -132,6 +132,7 @@ exports.onNewMessage = async (message, context) => {
 
     const messages = await gmailAPIClient.listMessages(oauth2Client, historyIdToStartFrom)
     console.info(`There are ${messages.length} messages in recent history, since historyId: ${historyIdToStartFrom}`)
+    console.info(`messages: ${JSON.stringify(messages)}`)
 
     const returned = []
     for(var message in messages) {

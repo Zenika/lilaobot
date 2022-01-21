@@ -55,6 +55,7 @@ describe('test gmail-api-client', () => {
     // then
     assert.equal(result.length, 2)
     assert.equal(result[0].id, '17e7962ea7dc7181')
+    assert.equal(result[1].id, '17e7bc7b2240c5fb')
   })
 
   it('listMessages: should return 0 messages when up to date', async () => {
