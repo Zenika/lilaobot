@@ -64,7 +64,7 @@ exports.saveToken = async (emailAddress, oauth2Client) => {
 exports.saveEntity = async (kind, key, value) => {
   return datastore.save({
     key: datastore.key([kind, key]),
-    data: value,
+    data: {value: value},
   })
 }
 
