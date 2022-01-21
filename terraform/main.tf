@@ -99,6 +99,10 @@ resource "google_cloudfunctions_function" "gmail_notifier_onNewMessage_function"
     resource   = "projects/${var.gcp_project}/topics/${var.function_topic}"
   }
   environment_variables = local.environment_variables
+
+  # implementation does not support parallelization,
+  # with this conf we insure only one message will be processed at a given time
+  max_instances = 1
 }
 
 # IAM entry for all users to invoke the function
