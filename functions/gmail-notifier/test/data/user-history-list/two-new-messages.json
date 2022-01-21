@@ -1,0 +1,39 @@
+{
+  "history": [
+    {
+      "id": "17166",
+      "messages": [
+        { "id": "17e7962ea7dc7181", "threadId": "17e7962ea7dc7181" }
+      ],
+      "messagesAdded": [
+        {
+          "message": {
+            "id": "17e7962ea7dc7181",
+            "threadId": "17e7962ea7dc7181",
+            "labelIds": ["UNREAD", "CATEGORY_UPDATES", "INBOX"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "17233",
+      "messages": [{ "id": "17e7962ea7dc7181", "threadId": "17e7962ea7dc7181" }]
+    },
+    {
+      "id": "17260",
+      "messages": [
+        { "id": "17e7bc7b2240c5fb", "threadId": "17e7962ea7dc7181" }
+      ],
+      "messagesAdded": [
+        {
+          "message": {
+            "id": "17e7bc7b2240c5fb",
+            "threadId": "17e7962ea7dc7181",
+            "labelIds": ["UNREAD", "CATEGORY_UPDATES", "INBOX"]
+          }
+        }
+      ]
+    }
+  ],
+  "historyId": "17306"
+}

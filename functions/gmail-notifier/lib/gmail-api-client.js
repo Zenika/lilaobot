@@ -62,9 +62,11 @@ exports.listMessages = async (oauth2Client, history) => {
   let messages = []
   let res = await gmail.users.history.list({ auth: oauth2Client, userId: 'me', startHistoryId:history, historyTypes: ['messageAdded'] })
   console.log(JSON.stringify(res))// TODO remove this temp log
-  for(let history of res.data.history){
-    if(history.messagesAdded){
-      messages = messages.concat(history.messagesAdded.map(x => x.message))
+  if(res.data.history){ // when there is no new history this will not be returned
+    for(let history of res.data.history){
+      if(history.messagesAdded){
+        messages = messages.concat(history.messagesAdded.map(x => x.message))
+      }
     }
   }
   return messages
