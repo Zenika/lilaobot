@@ -60,6 +60,20 @@ exports.saveToken = async (emailAddress, oauth2Client) => {
   })
 }
 
+// TODO we probalby want to refactor by extracting this and de deplucating code 
+exports.saveEntity = async (kind, key, value) => {
+  return datastore.save({
+    key: datastore.key([kind, key]),
+    data: value,
+  })
+}
+
+exports.getEntities = async (kind, key) => {
+  return datastore.get(
+    datastore.key([kind, key])
+  )
+}
+
 /**
  * Helper function to delete an OAuth 2.0 access token from Datastore
  */

@@ -135,6 +135,8 @@ describe('test gmail-notifier functions', () => {
   it('onNewMessage: should received message from Pub/sub and retreive email content', async () => {
     // given
     sandbox.stub(oauthLibrary, 'fetchToken').returns(Promise.resolve())
+    sandbox.stub(oauthLibrary, 'getEntities').returns(Promise.resolve())
+    sandbox.stub(oauthLibrary, 'saveEntity').returns(Promise.resolve())
     sandbox
       .stub(gmailAPIClient, 'listMessages')
       .returns(Promise.resolve({ data: { messages: [{ id: '1234' }] } }))
