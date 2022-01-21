@@ -41,13 +41,7 @@ describe('test gmail-api-client', () => {
       users: {
         history: {
           list: function () {
-            return {
-              data: {
-                messages: [gmailMessage],
-                nextPageToken: undefined,
-                resultSizeEstimate: 1,
-              },
-            }
+            return require("./users-history-list-response.json")
           },
         },
       },
@@ -57,7 +51,8 @@ describe('test gmail-api-client', () => {
     const result = await gmailAPIClient.listMessages(oauth2Client)
 
     // then
-    assert.equal(result[0].id, ['1234'])
+    assert.equal(result.length, 2)
+    assert.equal(result[0].id, '17e7962ea7dc7181')
   })
 
   it('getMessageById: should get a message by id', async () => {

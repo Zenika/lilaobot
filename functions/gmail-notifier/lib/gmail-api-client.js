@@ -59,15 +59,13 @@ exports.unwatchGmailInbox = async (oauth2Client) => {
  * @returns A promise containing a list of GMail message IDs
  */
 exports.listMessages = async (oauth2Client, history) => {
-  var messages = []
-  var listFragment
-  var pageToken = undefined
-  do {
-    listFragment = gmail.users.history.list({ auth: oauth2Client, userId: 'me', pageToken: pageToken, startHistoryId:history, 
-      historyTypes: ['messageAdded'] })
-    pageToken = listFragment.data.nextPageToken
-    messages = messages.concat(listFragment.data.messages)
-  } while(pageToken!==undefined);
+  let messages = []
+  let res = gmail.users.history.list({ auth: oauth2Client, userId: 'me', startHistoryId:history, historyTypes: ['messageAdded'] })
+  for(let history of res.data.history){
+    if(history.messagesAdded){
+      messages = messages.concat(history.messagesAdded.map(x => x.message))
+    }
+  }
   return messages
 }
 
