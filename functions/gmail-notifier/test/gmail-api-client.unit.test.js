@@ -41,7 +41,9 @@ describe('test gmail-api-client', () => {
       users: {
         history: {
           list: function () {
-            return require("./users-history-list-response.json")
+            return {
+              data: require("./data/user-history-list/two-new-messages.json")
+            }
           },
         },
       },
@@ -53,6 +55,27 @@ describe('test gmail-api-client', () => {
     // then
     assert.equal(result.length, 2)
     assert.equal(result[0].id, '17e7962ea7dc7181')
+  })
+
+  it('listMessages: should return 0 messages when up to date', async () => {
+    // given
+    const gmailAPIClient = getGmailAPIClient({
+      users: {
+        history: {
+          list: function () {
+            return {
+              data: require("./data/user-history-list/up-to-date.json")
+            }
+          },
+        },
+      },
+    })
+
+    // when
+    const result = await gmailAPIClient.listMessages(oauth2Client)
+
+    // then
+    assert.equal(result.length, 0)
   })
 
   it('getMessageById: should get a message by id', async () => {

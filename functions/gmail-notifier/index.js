@@ -112,12 +112,26 @@ exports.onNewMessage = async (message, context) => {
   const dataStr = Buffer.from(message.data, 'base64').toString()
   const dataObj = JSON.parse(dataStr)
   const emailAddress = dataObj.emailAddress
-  console.info(`Processing messages for account ${emailAddress} starting at history ${dataObj.historyId}`)
+  const currentHistoryId = dataObj.historyId
+  console.info(`Processing messages for account ${emailAddress} with current history ${currentHistoryId}`)
 
   try {
     const oauth2Client = await oauth.fetchToken(emailAddress)
-    const messages = await gmailAPIClient.listMessages(oauth2Client, dataObj.historyId)
-    console.info(`There are ${messages.length} messages in recent history`)
+
+    const historyIdKind = 'GmailHistory'
+    const lastHistoryKey = 'lastHistoryId'
+    let historyIdToStartFrom
+    const histories = await oauth.getEntities(historyIdKind, lastHistoryKey)
+    if(historyIdToStartFrom){
+      historyIdToStartFrom = histories[0]
+    }else{
+      historyIdToStartFrom = currentHistoryId
+      console.log(`initializing lastHistoryId ${historyIdToStartFrom} for first time`)
+    }
+
+    const messages = await gmailAPIClient.listMessages(oauth2Client, historyIdToStartFrom)
+    console.info(`There are ${messages.length} messages in recent history, since historyId: ${historyIdToStartFrom}`)
+
     const returned = []
     for(var message in messages) {
       console.info(`Extracting real GMail message from ${message}`)
@@ -129,6 +143,7 @@ exports.onNewMessage = async (message, context) => {
       processMessage(emailAddress, messageResponse)
       returned.push({message:message, messageResponse:messageResponse, status:'OK'})
     }
+    await oauth.saveEntity(historyIdKind, lastHistoryKey, currentHistoryId)
     return returned
   } catch (err) {
     // Handle unexpected errors
