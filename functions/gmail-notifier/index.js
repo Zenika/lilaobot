@@ -122,7 +122,7 @@ exports.onNewMessage = async (message, context) => {
     const lastHistoryKey = 'lastHistoryId'
     let historyIdToStartFrom
     const histories = await oauth.getEntities(historyIdKind, lastHistoryKey)
-    if(historyIdToStartFrom){
+    if(histories && histories.length > 0){
       historyIdToStartFrom = histories[0]
     }else{
       historyIdToStartFrom = currentHistoryId
