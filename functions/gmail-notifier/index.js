@@ -135,16 +135,16 @@ exports.onNewMessage = async (message, context) => {
     console.info(`messages: ${JSON.stringify(messages)}`)
 
     const returned = []
-    for(var message in messages) {
-      console.info(`Extracting real GMail message from ${message}`)
+    messages.forEach(async message => {
+      console.info(`Extracting real GMail message from ${JSON.stringify(message)}`)
       const messageResponse = await gmailAPIClient.getMessageById(
         oauth2Client,
         message.id
       )
   
-      processMessage(emailAddress, messageResponse)
-      returned.push({message:message, messageResponse:messageResponse, status:'OK'})
-    }
+      let sentMessage = processMessage(emailAddress, messageResponse)
+      returned.push({message:message, sentMessage:sentMessage, messageResponse:messageResponse, status:'OK'})
+    })
     await oauth.saveEntity(historyIdKind, lastHistoryKey, currentHistoryId)
     return returned
   } catch (err) {
@@ -172,4 +172,5 @@ async function processMessage(emailAddress, messageResponse) {
   console.info(`Sending slack message for ${messageResponse.data.id} (subject is ${mailSubject})`)
   await slackClient.postMessageToSlack(slackMessage)
   console.info(`Sent! slack message for ${messageResponse.data.id} (subject is ${mailSubject}).\nFull message is \n"""${slackMessage}"""`)
+  return slackMessage
 }

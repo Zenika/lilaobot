@@ -139,7 +139,7 @@ describe('test gmail-notifier functions', () => {
     sandbox.stub(oauthLibrary, 'saveEntity').returns(Promise.resolve())
     sandbox
       .stub(gmailAPIClient, 'listMessages')
-      .returns(Promise.resolve({ data: { messages: [{ id: '1234' }] } }))
+      .returns(Promise.resolve( [{ id: '1234' }]))
     const gmailMessage = require('./gmail-message-response.json')
     sandbox
       .stub(gmailAPIClient, 'getMessageById')
@@ -161,6 +161,7 @@ describe('test gmail-notifier functions', () => {
 
     // then
     assert.equal(result.length, 1)
+    assert.match(await result[0].sentMessage, /CORPS DU MAIL/)
     sandbox.assert.called(slackClientSpy);
   })
 })
